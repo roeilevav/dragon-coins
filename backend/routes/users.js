@@ -350,6 +350,24 @@ router.post('/:id/inventory/:itemId/unlist', (req, res) => {
   return res.json({ success: true });
 });
 
+// ---- Extra Merchant ----
+const HIRE_MERCHANT_COST = 300;
+
+// POST /users/:id/hire-merchant — pay 300 coins to unlock an extra merchant slot
+router.post('/:id/hire-merchant', (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  const user   = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+  if (!user) return res.status(404).json({ error: 'User not found.' });
+
+  if (user.coins < HIRE_MERCHANT_COST) {
+    return res.status(402).json({ error: `Need ${HIRE_MERCHANT_COST} coins to hire the extra merchant.` });
+  }
+
+  db.prepare('UPDATE users SET coins = coins - ? WHERE id = ?').run(HIRE_MERCHANT_COST, userId);
+  const updated = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+  return res.json({ user: updated, cost: HIRE_MERCHANT_COST });
+});
+
 // ---- Boss Fight rewards ----
 const bossRewards     = new Map(); // userId -> lastRewardAt (ms)
 const BOSS_REWARD_AMT = 75;

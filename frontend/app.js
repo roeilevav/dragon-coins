@@ -836,6 +836,12 @@ function closeQuizModal() {
 // ============================================================
 function goToMarketScreen() {
   updateBalances();
+  // Reset extra merchant state each visit
+  extraMerchantHired = false;
+  const hireBtn = $('hire-merchant-btn');
+  if (hireBtn) { hireBtn.classList.remove('hidden'); hireBtn.disabled = false; }
+  const hireStatus = $('hire-merchant-status');
+  if (hireStatus) hireStatus.classList.add('hidden');
   renderMarket();
   renderPlayerListings();
   showScreen('market');
@@ -1393,17 +1399,104 @@ async function handleCreateSubmit() {
 }
 
 // ============================================================
+//  EXTRA MERCHANT (MARKET)
+// ============================================================
+const HIRE_MERCHANT_COST = 300;
+let extraMerchantHired   = false;
+
+async function handleHireMerchant() {
+  const btn = $('hire-merchant-btn');
+  if (extraMerchantHired || btn.disabled) return;
+
+  if (currentUser.coins < HIRE_MERCHANT_COST) {
+    showToast(`Need 🪙 ${HIRE_MERCHANT_COST} coins to hire the extra merchant!`, true);
+    return;
+  }
+
+  btn.disabled = true;
+  try {
+    const { status, data } = await apiPost(`/users/${currentUser.id}/hire-merchant`, {});
+    if (status === 402) {
+      showToast(`Not enough coins! Need 🪙 ${HIRE_MERCHANT_COST}`, true);
+      btn.disabled = false;
+      return;
+    }
+    if (status !== 200) {
+      showToast('Could not hire merchant. Try again!', true);
+      btn.disabled = false;
+      return;
+    }
+    currentUser = data.user;
+    updateBalances();
+    extraMerchantHired = true;
+    btn.classList.add('hidden');
+    $('hire-merchant-status').classList.remove('hidden');
+    addExtraMerchantToGrid();
+    showToast('⭐ Goldsworth the Extra Merchant is here!');
+  } catch (err) {
+    showToast('Could not reach server!', true);
+    btn.disabled = false;
+  }
+}
+
+function addExtraMerchantToGrid() {
+  const grid = $('merchant-grid');
+  const currentItems = [...grid.querySelectorAll('.buy-btn')].map(b => b.dataset.item);
+  const pool = ITEMS.filter(i => !currentItems.includes(i.name));
+  if (pool.length === 0) return;
+  const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 2);
+  shuffled.forEach(item => {
+    const price     = Math.floor(Math.random() * 51) + 30;
+    const canAfford = currentUser.coins >= price;
+    const card = document.createElement('div');
+    card.className = 'merchant-card extra-merchant-card';
+    card.innerHTML = `
+      <div class="merchant-avatar">⭐</div>
+      <div class="merchant-name extra-merchant-name">Goldsworth</div>
+      <div class="item-emoji">${item.emoji}</div>
+      <div class="item-name">${item.name}</div>
+      <div class="item-price">🪙 ${price}</div>
+      <button class="btn btn-green buy-btn" ${canAfford ? '' : 'disabled'}
+        data-item="${item.name}" data-merchant="Goldsworth" data-price="${price}">
+        ${canAfford ? 'Buy ✨' : 'Too expensive 💸'}
+      </button>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ============================================================
 //  BOSS FIGHT
 // ============================================================
-const BOSS_MAX_HP   = 120;
-const PLAYER_MAX_HP = 100;
+// Scaling: each win makes boss 15% harder
+const PLAYER_MAX_HP     = 80;   // harder base for player
+const BOSS_BASE_HP      = 150;  // harder base HP
 const BOSS_REWARD_COINS = 75;
 
-let bossBattleItems = [];  // inventory items loaded for this battle
-let bossCurrentHp   = BOSS_MAX_HP;
-let playerCurrentHp = PLAYER_MAX_HP;
-let bossGameOver    = false;
-let bossAttacking   = false;  // lock while animating
+// Per-user boss level persisted in localStorage
+function getBossLevel() {
+  if (!currentUser) return 1;
+  return parseInt(localStorage.getItem(`bossLevel_${currentUser.username}`) || '1', 10);
+}
+function setBossLevel(level) {
+  if (!currentUser) return;
+  localStorage.setItem(`bossLevel_${currentUser.username}`, String(level));
+}
+function getBossScaledHp(level) {
+  return Math.round(BOSS_BASE_HP * Math.pow(1.15, level - 1));
+}
+function getBossScaledDmgRange(level) {
+  const scale = Math.pow(1.15, level - 1);
+  return [Math.round(8 * scale), Math.round(20 * scale)];
+}
+
+let bossBattleItems  = [];
+let bossCurrentHp    = BOSS_BASE_HP;
+let bossTotalHp      = BOSS_BASE_HP;
+let playerCurrentHp  = PLAYER_MAX_HP;
+let bossGameOver     = false;
+let bossAttacking    = false;
+let currentBossLevel = 1;
 
 function getBossDamageRange(item) {
   if (item.is_custom)  return [20, 35]; // ★★★★ custom
@@ -1421,8 +1514,9 @@ function bossDamageRoll(item) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function bossCounterRoll() {
-  return Math.floor(Math.random() * 9) + 5; // 5–13
+function bossCounterRoll(level) {
+  const [min, max] = getBossScaledDmgRange(level);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function bossPowerLabel(item) {
@@ -1455,11 +1549,13 @@ async function goToBossScreen() {
       return;
     }
 
-    bossBattleItems = usable;
-    bossCurrentHp   = BOSS_MAX_HP;
-    playerCurrentHp = PLAYER_MAX_HP;
-    bossGameOver    = false;
-    bossAttacking   = false;
+    currentBossLevel = getBossLevel();
+    bossBattleItems  = usable;
+    bossCurrentHp    = getBossScaledHp(currentBossLevel);
+    bossTotalHp      = bossCurrentHp;
+    playerCurrentHp  = PLAYER_MAX_HP;
+    bossGameOver     = false;
+    bossAttacking    = false;
     startBossBattle();
 
   } catch (err) {
@@ -1473,6 +1569,18 @@ function startBossBattle() {
   $('boss-gameover').classList.add('hidden');
   $('boss-attack-section').style.display = '';
 
+  // Show boss level badge
+  const lvlBadge = $('boss-level-badge');
+  if (lvlBadge) lvlBadge.textContent = `Lv. ${currentBossLevel}`;
+
+  // Change boss sprite as level rises (gets scarier)
+  const sprite = $('boss-sprite-el');
+  if (sprite) {
+    if      (currentBossLevel >= 10) sprite.textContent = '👹';
+    else if (currentBossLevel >= 5)  sprite.textContent = '🔥🐲🔥';
+    else                             sprite.textContent = '🐲';
+  }
+
   // Reset HP bars to full
   $('boss-hp-bar').style.width   = '100%';
   $('player-hp-bar').style.width = '100%';
@@ -1482,16 +1590,17 @@ function startBossBattle() {
   // Clear log
   const log = $('boss-log');
   log.innerHTML = '';
-  addBossLog('🐲 The Dragon Boss appears from the darkness!', 'info');
-  addBossLog('⚔️ Pick a weapon below to start attacking!', 'info');
+  const [dmgMin, dmgMax] = getBossScaledDmgRange(currentBossLevel);
+  addBossLog(`🐲 Dragon Boss (Lv. ${currentBossLevel}) appears! HP: ${bossTotalHp} | Attacks: ${dmgMin}–${dmgMax} dmg`, 'info');
+  addBossLog(`❤️ Your HP: ${PLAYER_MAX_HP} | ⚔️ Pick a weapon to attack!`, 'info');
 
   renderBossItems();
 }
 
 function updateBossHpText() {
-  const pct = Math.max(0, bossCurrentHp) / BOSS_MAX_HP * 100;
+  const pct = Math.max(0, bossCurrentHp) / bossTotalHp * 100;
   $('boss-hp-bar').style.width = pct + '%';
-  $('boss-hp-text').textContent = `❤️ ${Math.max(0, bossCurrentHp)} / ${BOSS_MAX_HP}`;
+  $('boss-hp-text').textContent = `❤️ ${Math.max(0, bossCurrentHp)} / ${bossTotalHp}`;
 }
 
 function updatePlayerHpText() {
@@ -1565,8 +1674,8 @@ async function handleBossItemClick(e) {
   // Wait before boss counter
   await new Promise(r => setTimeout(r, 650));
 
-  // Boss counter-attacks
-  const bossDmg = bossCounterRoll();
+  // Boss counter-attacks (scaled by level)
+  const bossDmg = bossCounterRoll(currentBossLevel);
   playerCurrentHp -= bossDmg;
   addBossLog(`🐲 Dragon Boss breathes fire — ${bossDmg} damage to you!`, 'boss-hit');
   updatePlayerHpText();
@@ -1594,13 +1703,22 @@ async function endBossBattle(playerWon) {
   gameover.classList.remove('hidden');
 
   if (playerWon) {
+    // Level up the boss for next fight
+    const newLevel = currentBossLevel + 1;
+    setBossLevel(newLevel);
+    const nextHp  = getBossScaledHp(newLevel);
+    const [nMin, nMax] = getBossScaledDmgRange(newLevel);
+
     addBossLog('🏆 VICTORY! The Dragon Boss has been defeated!', 'info');
+    addBossLog(`⚡ The boss powered up! Next fight: Lv.${newLevel} | HP ${nextHp} | Attacks ${nMin}–${nMax}`, 'boss-hit');
+
     gameover.innerHTML = `
       <div class="boss-gameover-icon">🏆</div>
       <div class="boss-gameover-title">Victory!</div>
-      <div class="boss-gameover-msg">You defeated the mighty Dragon Boss! Amazing!</div>
+      <div class="boss-gameover-msg">You defeated Dragon Boss Lv. ${currentBossLevel}! Amazing!</div>
       <div class="boss-gameover-reward" id="boss-reward-display">🪙 Claiming your reward...</div>
-      <button class="btn btn-gold btn-large" id="boss-play-again-btn">⚔️ Fight Again!</button>
+      <div class="boss-levelup-warn">⚡ Boss levelled up to <strong>Lv. ${newLevel}</strong>!<br>Next HP: ${nextHp} | Attack: ${nMin}–${nMax} dmg</div>
+      <button class="btn btn-gold btn-large" id="boss-play-again-btn">⚔️ Fight Lv.${newLevel}!</button>
       <button class="btn btn-purple" id="boss-go-roll-btn2">🎲 Back to Roll</button>
     `;
     document.getElementById('boss-play-again-btn').addEventListener('click', () => goToBossScreen());
@@ -1614,20 +1732,21 @@ async function endBossBattle(playerWon) {
         updateBalances();
         document.getElementById('boss-reward-display').textContent = `🪙 +${data.reward} coins earned!`;
       } else if (status === 429) {
-        document.getElementById('boss-reward-display').textContent = `⏳ Already claimed today — try again later!`;
+        document.getElementById('boss-reward-display').textContent = `⏳ Reward on cooldown — fight again for glory!`;
       } else {
         document.getElementById('boss-reward-display').textContent = `🎉 Victory is its own reward!`;
       }
     } catch (err) {
-      document.getElementById('boss-reward-display').textContent = `🎉 You are a Dragon Trainer!`;
+      document.getElementById('boss-reward-display').textContent = `🎉 You are a true Dragon Trainer!`;
     }
 
   } else {
     addBossLog('💀 Defeated... The Dragon Boss wins this round!', 'info');
+    const [dMin, dMax] = getBossScaledDmgRange(currentBossLevel);
     gameover.innerHTML = `
       <div class="boss-gameover-icon">💀</div>
       <div class="boss-gameover-title">Defeated!</div>
-      <div class="boss-gameover-msg">The Dragon Boss was too powerful! Craft more items and try again!</div>
+      <div class="boss-gameover-msg">Dragon Boss Lv.${currentBossLevel} was too powerful! (HP: ${bossTotalHp} | Attack: ${dMin}–${dMax})<br>Get more crafted items and try again!</div>
       <button class="btn btn-gold btn-large" id="boss-play-again-btn2">⚔️ Try Again!</button>
       <button class="btn btn-purple" id="boss-go-craft-btn">🔨 Craft Items</button>
     `;
@@ -1667,6 +1786,7 @@ function attachListeners() {
   // Market — delegated on the persistent grid wrappers
   $('merchant-grid').addEventListener('click', handleBuy);
   $('player-listings-grid').addEventListener('click', handleBuyListing);
+  $('hire-merchant-btn').addEventListener('click', handleHireMerchant);
 
   // Inventory sell/list/unlist
   $('inventory-grid').addEventListener('click', handleInventoryClick);

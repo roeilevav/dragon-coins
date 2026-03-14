@@ -100,6 +100,14 @@
     <main class="market-main">
       <h2>🛍️ Dragon Market</h2>
       <p class="market-subtitle">Prices change every visit — shop fast!</p>
+
+      <div class="hire-merchant-wrap">
+        <button id="hire-merchant-btn" class="btn btn-gold hire-merchant-btn">
+          ⭐ Hire Extra Merchant &nbsp;<span class="hire-cost">🪙 300</span>
+        </button>
+        <span id="hire-merchant-status" class="hire-merchant-status hidden">⭐ Extra merchant is open for business!</span>
+      </div>
+
       <div id="merchant-grid" class="merchant-grid"></div>
 
       <section id="player-listings-section" class="player-listings-section hidden">
@@ -302,12 +310,13 @@
         <!-- Combatant HP bars -->
         <div class="boss-combatants">
           <div class="boss-combatant">
-            <div class="boss-sprite">🐲</div>
+            <div class="boss-sprite" id="boss-sprite-el">🐲</div>
             <div class="boss-combatant-name">Dragon Boss</div>
+            <div class="boss-level-badge" id="boss-level-badge">Lv. 1</div>
             <div class="hp-bar-container">
               <div class="hp-bar boss-hp-bar" id="boss-hp-bar"></div>
             </div>
-            <div class="hp-text" id="boss-hp-text">❤️ 120 / 120</div>
+            <div class="hp-text" id="boss-hp-text">❤️ 150 / 150</div>
           </div>
 
           <div class="boss-vs-badge">⚔️<br>VS<br>⚔️</div>

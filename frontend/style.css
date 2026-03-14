@@ -1155,6 +1155,54 @@ body {
 }
 
 /* ===========================
+   EXTRA MERCHANT (MARKET)
+   =========================== */
+.hire-merchant-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.hire-merchant-btn {
+  font-size: 0.95rem;
+  padding: 12px 22px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 0 var(--gold-dk), 0 0 16px rgba(255,215,0,0.25);
+}
+.hire-cost {
+  background: rgba(76,29,149,0.18);
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 0.85rem;
+}
+.hire-merchant-status {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #92400E;
+  background: #FEF9C3;
+  border: 2px solid var(--gold-dk);
+  border-radius: 20px;
+  padding: 6px 16px;
+}
+.extra-merchant-card {
+  border: 3px solid var(--gold) !important;
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%) !important;
+  box-shadow: 0 0 20px rgba(255,215,0,0.3) !important;
+}
+.extra-merchant-card:hover {
+  border-color: #F59E0B !important;
+  box-shadow: 0 0 30px rgba(255,215,0,0.45) !important;
+}
+.extra-merchant-name {
+  color: #92400E !important;
+  font-weight: 900 !important;
+}
+
+/* ===========================
    BOSS NAV LINK (highlight)
    =========================== */
 .nav-boss-link {
@@ -1247,6 +1295,19 @@ body {
 }
 
 .boss-sprite { font-size: 3.2rem; line-height: 1; margin-bottom: 6px; }
+.boss-level-badge {
+  display: inline-block;
+  background: linear-gradient(90deg, #EF4444, #F97316);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 900;
+  padding: 2px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 8px rgba(239,68,68,0.5);
+}
 .boss-combatant-name {
   font-weight: 800;
   font-size: 0.88rem;
@@ -1384,6 +1445,17 @@ body {
 .boss-gameover-msg     { font-size: 0.95rem; color: #C4B5FD; font-weight: 600; line-height: 1.5; }
 .boss-gameover-reward  { font-size: 1.3rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 10px rgba(255,215,0,0.5); }
 .boss-gameover .btn    { min-width: 160px; }
+.boss-levelup-warn {
+  background: rgba(239,68,68,0.2);
+  border: 2px solid rgba(239,68,68,0.5);
+  border-radius: 14px;
+  padding: 10px 16px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #FCA5A5;
+  line-height: 1.5;
+  width: 100%;
+}
 
 /* ===========================
    RESPONSIVE
