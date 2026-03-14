@@ -350,4 +350,29 @@ router.post('/:id/inventory/:itemId/unlist', (req, res) => {
   return res.json({ success: true });
 });
 
+// ---- Boss Fight rewards ----
+const bossRewards     = new Map(); // userId -> lastRewardAt (ms)
+const BOSS_REWARD_AMT = 75;
+const BOSS_COOLDOWN   = 5 * 60 * 1000; // 5 minutes between rewards
+
+// POST /users/:id/boss-reward — award coins for defeating the Dragon Boss
+router.post('/:id/boss-reward', (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+  if (!user) return res.status(404).json({ error: 'User not found.' });
+
+  const lastReward = bossRewards.get(userId);
+  if (lastReward && Date.now() - lastReward < BOSS_COOLDOWN) {
+    const remaining = BOSS_COOLDOWN - (Date.now() - lastReward);
+    return res.status(429).json({ error: 'Already claimed boss reward recently!', remaining_ms: remaining });
+  }
+
+  db.prepare('UPDATE users SET coins = coins + ? WHERE id = ?').run(BOSS_REWARD_AMT, userId);
+  bossRewards.set(userId, Date.now());
+
+  const updated = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+  return res.json({ user: updated, reward: BOSS_REWARD_AMT });
+});
+
 module.exports = router;

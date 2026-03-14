@@ -1155,10 +1155,243 @@ body {
 }
 
 /* ===========================
+   BOSS NAV LINK (highlight)
+   =========================== */
+.nav-boss-link {
+  background: rgba(239,68,68,0.35) !important;
+  border: 1px solid rgba(239,68,68,0.6) !important;
+}
+.nav-boss-link:hover { background: rgba(239,68,68,0.55) !important; }
+
+/* ===========================
+   BOSS FIGHT SCREEN
+   =========================== */
+#screen-boss .top-bar {
+  background: linear-gradient(90deg, #1a0a2e, #4C1D95);
+}
+
+.boss-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 40px;
+  background: linear-gradient(160deg, #1a0a2e 0%, #2d1b4e 40%, #1f0a1e 100%);
+  gap: 16px;
+}
+
+/* Loading */
+.boss-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: #fff;
+  margin-top: 60px;
+}
+.boss-loading-dragon {
+  font-size: 6rem;
+  animation: bounce 1.2s infinite;
+}
+.boss-loading p {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #C4B5FD;
+}
+
+/* No items */
+.boss-no-items {
+  background: rgba(255,255,255,0.07);
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 24px;
+  padding: 40px 32px;
+  text-align: center;
+  color: #fff;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 40px;
+}
+.boss-no-items h3 { font-size: 1.5rem; font-weight: 900; }
+.boss-no-items p  { color: #C4B5FD; font-size: 1rem; font-weight: 600; }
+
+/* Arena container */
+.boss-arena {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Combatants row */
+.boss-combatants {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.boss-combatant {
+  background: rgba(255,255,255,0.07);
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 16px 20px;
+  text-align: center;
+  flex: 1;
+  min-width: 150px;
+  max-width: 210px;
+}
+
+.boss-sprite { font-size: 3.2rem; line-height: 1; margin-bottom: 6px; }
+.boss-combatant-name {
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: #E9D5FF;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.hp-bar-container {
+  background: rgba(0,0,0,0.45);
+  border-radius: 20px;
+  height: 14px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.hp-bar {
+  height: 100%;
+  border-radius: 20px;
+  transition: width 0.55s ease;
+}
+.boss-hp-bar   { background: linear-gradient(90deg, #EF4444, #F97316); width: 100%; }
+.player-hp-bar { background: linear-gradient(90deg, #10B981, #34D399); width: 100%; }
+.hp-text { font-size: 0.8rem; font-weight: 700; color: #E9D5FF; }
+
+.boss-vs-badge {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--gold);
+  text-align: center;
+  line-height: 1.3;
+  flex-shrink: 0;
+  text-shadow: 0 0 12px rgba(255,215,0,0.55);
+}
+
+/* Battle log */
+.boss-log {
+  background: rgba(0,0,0,0.4);
+  border-radius: 14px;
+  padding: 12px 16px;
+  min-height: 90px;
+  max-height: 150px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.boss-log-entry {
+  font-size: 0.87rem;
+  font-weight: 700;
+  padding: 3px 0;
+  animation: popIn 0.22s ease;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.boss-log-entry.player-hit { color: #FDE68A; }
+.boss-log-entry.boss-hit   { color: #FCA5A5; }
+.boss-log-entry.info       { color: #A7F3D0; }
+
+/* Attack section */
+.boss-attack-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.boss-attack-hint {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--gold);
+  text-shadow: 0 0 8px rgba(255,215,0,0.4);
+}
+
+/* Item grid */
+.boss-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+.boss-item-card {
+  background: rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,255,255,0.18);
+  border-radius: 16px;
+  padding: 12px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.12s, box-shadow 0.15s;
+  color: #fff;
+  user-select: none;
+}
+.boss-item-card:hover:not(.battle-locked) {
+  background: rgba(255,215,0,0.18);
+  border-color: var(--gold);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(255,215,0,0.2);
+}
+.boss-item-card.custom-weapon  { border-color: rgba(249,168,212,0.5); }
+.boss-item-card.crafted-weapon { border-color: rgba(253,211,77,0.5); }
+.boss-item-card.battle-locked  { opacity: 0.4; cursor: not-allowed; }
+.boss-item-emoji { font-size: 2rem; margin-bottom: 4px; }
+.boss-item-name  { font-size: 0.67rem; font-weight: 700; color: #E9D5FF; line-height: 1.2; margin-bottom: 4px; }
+.boss-item-power { font-size: 0.62rem; font-weight: 800; color: var(--gold); display: block; }
+
+/* Flee button */
+.boss-flee-btn {
+  background: rgba(255,255,255,0.12);
+  color: #E9D5FF;
+  border: 2px solid rgba(255,255,255,0.2);
+  font-size: 0.9rem;
+  padding: 10px 28px;
+  border-radius: 20px;
+}
+.boss-flee-btn:hover { background: rgba(239,68,68,0.3); border-color: rgba(239,68,68,0.6); }
+
+/* Game Over panel */
+.boss-gameover {
+  background: rgba(0,0,0,0.75);
+  border-radius: 24px;
+  padding: 32px 28px;
+  text-align: center;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 2px solid rgba(255,255,255,0.12);
+}
+.boss-gameover-icon    { font-size: 4.5rem; }
+.boss-gameover-title   { font-size: 2rem; font-weight: 900; color: #fff; }
+.boss-gameover-msg     { font-size: 0.95rem; color: #C4B5FD; font-weight: 600; line-height: 1.5; }
+.boss-gameover-reward  { font-size: 1.3rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+.boss-gameover .btn    { min-width: 160px; }
+
+/* ===========================
    RESPONSIVE
    =========================== */
 @media (max-width: 480px) {
   .login-card { padding: 28px 20px; }
   .btn-giant  { padding: 18px 40px; font-size: 1.3rem; }
   .merchant-grid { grid-template-columns: 1fr 1fr; }
+  .boss-combatant { min-width: 130px; padding: 12px 14px; }
+  .boss-items-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
 }

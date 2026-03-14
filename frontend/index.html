@@ -45,6 +45,7 @@
       <nav class="nav-links">
         <a href="#" id="nav-craft-from-roll">🔨 Craft</a>
         <a href="#" id="nav-create-from-roll">🎨 Create</a>
+        <a href="#" id="nav-boss-from-roll" class="nav-boss-link">⚔️ Boss Fight</a>
       </nav>
       <button class="btn btn-logout logout-btn">🚪 Logout</button>
     </header>
@@ -91,6 +92,7 @@
         <a href="#" id="nav-leaderboard">🏆 Leaderboard</a>
         <a href="#" id="nav-craft-from-market">🔨 Craft</a>
         <a href="#" id="nav-create-from-market">🎨 Create</a>
+        <a href="#" id="nav-boss-from-market" class="nav-boss-link">⚔️ Boss</a>
       </nav>
       <button class="btn btn-logout logout-btn">🚪 Logout</button>
     </header>
@@ -120,6 +122,7 @@
         <a href="#" id="nav-leaderboard-from-inv">🏆 Leaderboard</a>
         <a href="#" id="nav-craft-from-inv">🔨 Craft</a>
         <a href="#" id="nav-create-from-inv">🎨 Create</a>
+        <a href="#" id="nav-boss-from-inv" class="nav-boss-link">⚔️ Boss</a>
       </nav>
       <button class="btn btn-logout logout-btn">🚪 Logout</button>
     </header>
@@ -143,6 +146,7 @@
         <a href="#" id="nav-inventory-from-lb">🎒 Inventory</a>
         <a href="#" id="nav-craft-from-lb">🔨 Craft</a>
         <a href="#" id="nav-create-from-lb">🎨 Create</a>
+        <a href="#" id="nav-boss-from-lb" class="nav-boss-link">⚔️ Boss</a>
       </nav>
       <button class="btn btn-logout logout-btn">🚪 Logout</button>
     </header>
@@ -166,6 +170,7 @@
         <a href="#" id="nav-inventory-from-craft">🎒 Inventory</a>
         <a href="#" id="nav-leaderboard-from-craft">🏆 Leaderboard</a>
         <a href="#" id="nav-create-from-craft">🎨 Create</a>
+        <a href="#" id="nav-boss-from-craft" class="nav-boss-link">⚔️ Boss</a>
       </nav>
       <button class="btn btn-logout logout-btn">🚪 Logout</button>
     </header>
@@ -190,6 +195,7 @@
         <a href="#" id="nav-inventory-from-create">🎒 Inventory</a>
         <a href="#" id="nav-leaderboard-from-create">🏆 Leaderboard</a>
         <a href="#" id="nav-craft-from-create">🔨 Craft</a>
+        <a href="#" id="nav-boss-from-create" class="nav-boss-link">⚔️ Boss</a>
       </nav>
       <button class="btn btn-logout logout-btn">🚪 Logout</button>
     </header>
@@ -252,6 +258,83 @@
           🎨 Forge Item
         </button>
         <p id="create-submit-hint" class="create-submit-hint">Select 5 items, add image, name &amp; creator to unlock</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- ========== BOSS SCREEN ========== -->
+  <div id="screen-boss" class="screen">
+    <header class="top-bar">
+      <div class="user-info">
+        <span id="boss-username" class="username-tag"></span>
+        <span class="balance" id="boss-balance">🪙 0</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#" id="nav-roll-from-boss">🎲 Roll</a>
+        <a href="#" id="nav-market-from-boss">🛍️ Market</a>
+        <a href="#" id="nav-inventory-from-boss">🎒 Inventory</a>
+        <a href="#" id="nav-leaderboard-from-boss">🏆 Leaderboard</a>
+        <a href="#" id="nav-craft-from-boss">🔨 Craft</a>
+        <a href="#" id="nav-create-from-boss">🎨 Create</a>
+      </nav>
+      <button class="btn btn-logout logout-btn">🚪 Logout</button>
+    </header>
+
+    <main class="boss-main">
+
+      <!-- Loading state -->
+      <div id="boss-loading" class="boss-loading">
+        <div class="boss-loading-dragon">🐲</div>
+        <p>Entering the Dragon's Lair...</p>
+      </div>
+
+      <!-- No items warning -->
+      <div id="boss-no-items" class="boss-no-items hidden">
+        <div style="font-size:4rem">🔒</div>
+        <h3>You need items to fight!</h3>
+        <p>Visit the Market or Craft items first, then return to battle!</p>
+        <button class="btn btn-gold btn-large" id="boss-go-market-btn">🛒 Get Items</button>
+      </div>
+
+      <!-- Battle Arena -->
+      <div id="boss-arena" class="boss-arena hidden">
+
+        <!-- Combatant HP bars -->
+        <div class="boss-combatants">
+          <div class="boss-combatant">
+            <div class="boss-sprite">🐲</div>
+            <div class="boss-combatant-name">Dragon Boss</div>
+            <div class="hp-bar-container">
+              <div class="hp-bar boss-hp-bar" id="boss-hp-bar"></div>
+            </div>
+            <div class="hp-text" id="boss-hp-text">❤️ 120 / 120</div>
+          </div>
+
+          <div class="boss-vs-badge">⚔️<br>VS<br>⚔️</div>
+
+          <div class="boss-combatant">
+            <div class="boss-sprite">🧙</div>
+            <div class="boss-combatant-name" id="boss-player-label">You</div>
+            <div class="hp-bar-container">
+              <div class="hp-bar player-hp-bar" id="player-hp-bar"></div>
+            </div>
+            <div class="hp-text" id="player-hp-text">❤️ 100 / 100</div>
+          </div>
+        </div>
+
+        <!-- Battle log -->
+        <div id="boss-log" class="boss-log"></div>
+
+        <!-- Weapon selection -->
+        <div id="boss-attack-section" class="boss-attack-section">
+          <p class="boss-attack-hint">⚔️ Pick a weapon to attack the Dragon Boss!</p>
+          <div id="boss-items-grid" class="boss-items-grid"></div>
+          <button class="btn boss-flee-btn" id="boss-flee-btn">🏃 Flee Battle</button>
+        </div>
+
+        <!-- Game Over panel -->
+        <div id="boss-gameover" class="boss-gameover hidden"></div>
+
       </div>
     </main>
   </div>

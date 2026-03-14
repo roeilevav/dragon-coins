@@ -502,9 +502,9 @@ function itemEmoji(name) {
 function updateBalances() {
   const label  = `🪙 ${currentUser.coins}`;
   const uLabel = `👤 ${currentUser.username}`;
-  ['roll-balance', 'market-balance', 'inv-balance', 'lb-balance', 'craft-balance', 'create-balance']
+  ['roll-balance', 'market-balance', 'inv-balance', 'lb-balance', 'craft-balance', 'create-balance', 'boss-balance']
     .forEach(id => { const el = $(id); if (el) el.textContent = label; });
-  ['roll-username', 'market-username', 'inv-username', 'lb-username', 'craft-username', 'create-username']
+  ['roll-username', 'market-username', 'inv-username', 'lb-username', 'craft-username', 'create-username', 'boss-username']
     .forEach(id => { const el = $(id); if (el) el.textContent = uLabel; });
 }
 
@@ -1393,6 +1393,250 @@ async function handleCreateSubmit() {
 }
 
 // ============================================================
+//  BOSS FIGHT
+// ============================================================
+const BOSS_MAX_HP   = 120;
+const PLAYER_MAX_HP = 100;
+const BOSS_REWARD_COINS = 75;
+
+let bossBattleItems = [];  // inventory items loaded for this battle
+let bossCurrentHp   = BOSS_MAX_HP;
+let playerCurrentHp = PLAYER_MAX_HP;
+let bossGameOver    = false;
+let bossAttacking   = false;  // lock while animating
+
+function getBossDamageRange(item) {
+  if (item.is_custom)  return [20, 35]; // ★★★★ custom
+  if (item.is_crafted) return [14, 25]; // ★★★  crafted
+  // Weapon-y market items
+  const name = (item.item_name || '').toLowerCase();
+  const weaponWords = ['sword','axe','ninja','shield','freeze','cannon','battle','magic','wand',
+                       'potion','orb','crystal','fire','ice','thunder','star','bomb','dagger','lance'];
+  if (weaponWords.some(w => name.includes(w))) return [10, 20]; // ★★
+  return [6, 14]; // ★ regular
+}
+
+function bossDamageRoll(item) {
+  const [min, max] = getBossDamageRange(item);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function bossCounterRoll() {
+  return Math.floor(Math.random() * 9) + 5; // 5–13
+}
+
+function bossPowerLabel(item) {
+  if (item.is_custom)  return '★★★★ Custom';
+  if (item.is_crafted) return '★★★ Crafted';
+  const name = (item.item_name || '').toLowerCase();
+  const weaponWords = ['sword','axe','ninja','shield','freeze','cannon','battle','magic','wand',
+                       'potion','orb','crystal','fire','ice','thunder','star','bomb'];
+  return weaponWords.some(w => name.includes(w)) ? '★★ Weapon' : '★ Item';
+}
+
+async function goToBossScreen() {
+  updateBalances();
+  showScreen('boss');
+  $('boss-player-label').textContent = `👤 ${currentUser.username}`;
+  $('boss-loading').classList.remove('hidden');
+  $('boss-no-items').classList.add('hidden');
+  $('boss-arena').classList.add('hidden');
+
+  try {
+    const { status, data } = await apiGet(`/users/${currentUser.id}/inventory`);
+    $('boss-loading').classList.add('hidden');
+
+    if (status !== 200) { showToast('Could not load inventory 😢', true); return; }
+
+    // All non-listed items can be used in battle
+    const usable = data.items.filter(i => !i.listed_price);
+    if (usable.length === 0) {
+      $('boss-no-items').classList.remove('hidden');
+      return;
+    }
+
+    bossBattleItems = usable;
+    bossCurrentHp   = BOSS_MAX_HP;
+    playerCurrentHp = PLAYER_MAX_HP;
+    bossGameOver    = false;
+    bossAttacking   = false;
+    startBossBattle();
+
+  } catch (err) {
+    $('boss-loading').classList.add('hidden');
+    showToast('Could not reach server 😢', true);
+  }
+}
+
+function startBossBattle() {
+  $('boss-arena').classList.remove('hidden');
+  $('boss-gameover').classList.add('hidden');
+  $('boss-attack-section').style.display = '';
+
+  // Reset HP bars to full
+  $('boss-hp-bar').style.width   = '100%';
+  $('player-hp-bar').style.width = '100%';
+  updateBossHpText();
+  updatePlayerHpText();
+
+  // Clear log
+  const log = $('boss-log');
+  log.innerHTML = '';
+  addBossLog('🐲 The Dragon Boss appears from the darkness!', 'info');
+  addBossLog('⚔️ Pick a weapon below to start attacking!', 'info');
+
+  renderBossItems();
+}
+
+function updateBossHpText() {
+  const pct = Math.max(0, bossCurrentHp) / BOSS_MAX_HP * 100;
+  $('boss-hp-bar').style.width = pct + '%';
+  $('boss-hp-text').textContent = `❤️ ${Math.max(0, bossCurrentHp)} / ${BOSS_MAX_HP}`;
+}
+
+function updatePlayerHpText() {
+  const pct = Math.max(0, playerCurrentHp) / PLAYER_MAX_HP * 100;
+  $('player-hp-bar').style.width = pct + '%';
+  $('player-hp-text').textContent = `❤️ ${Math.max(0, playerCurrentHp)} / ${PLAYER_MAX_HP}`;
+}
+
+function addBossLog(msg, type = 'info') {
+  const log = $('boss-log');
+  const entry = document.createElement('div');
+  entry.className = `boss-log-entry ${type}`;
+  entry.textContent = msg;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+}
+
+function renderBossItems() {
+  const grid = $('boss-items-grid');
+  grid.innerHTML = bossBattleItems.map((item, idx) => {
+    let emoji;
+    if (item.is_crafted) {
+      const craft = CRAFTS.find(c => c.result.name === item.item_name);
+      emoji = craft ? craft.result.emoji : '✨';
+    } else if (item.is_custom) {
+      emoji = '🎨';
+    } else {
+      emoji = itemEmoji(item.item_name);
+    }
+    const powerLabel = bossPowerLabel(item);
+    const weaponClass = item.is_custom ? 'custom-weapon' : item.is_crafted ? 'crafted-weapon' : '';
+    return `
+      <div class="boss-item-card ${weaponClass}" data-boss-idx="${idx}">
+        <div class="boss-item-emoji">${emoji}</div>
+        <div class="boss-item-name">${item.item_name}</div>
+        <span class="boss-item-power">${powerLabel}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+async function handleBossItemClick(e) {
+  if (bossGameOver || bossAttacking) return;
+  const card = e.target.closest('.boss-item-card');
+  if (!card) return;
+
+  const idx  = parseInt(card.dataset.bossIdx, 10);
+  const item = bossBattleItems[idx];
+  if (!item) return;
+
+  bossAttacking = true;
+  // Lock all item cards during animation
+  document.querySelectorAll('.boss-item-card').forEach(c => c.classList.add('battle-locked'));
+
+  // Player attacks
+  const dmg = bossDamageRoll(item);
+  bossCurrentHp -= dmg;
+  const emoji = card.querySelector('.boss-item-emoji').textContent;
+  addBossLog(`⚔️ You attack with ${emoji} ${item.item_name} — ${dmg} damage!`, 'player-hit');
+  updateBossHpText();
+
+  // Check if boss died
+  if (bossCurrentHp <= 0) {
+    bossCurrentHp = 0;
+    updateBossHpText();
+    await new Promise(r => setTimeout(r, 500));
+    endBossBattle(true);
+    return;
+  }
+
+  // Wait before boss counter
+  await new Promise(r => setTimeout(r, 650));
+
+  // Boss counter-attacks
+  const bossDmg = bossCounterRoll();
+  playerCurrentHp -= bossDmg;
+  addBossLog(`🐲 Dragon Boss breathes fire — ${bossDmg} damage to you!`, 'boss-hit');
+  updatePlayerHpText();
+
+  // Check if player died
+  if (playerCurrentHp <= 0) {
+    playerCurrentHp = 0;
+    updatePlayerHpText();
+    await new Promise(r => setTimeout(r, 500));
+    endBossBattle(false);
+    return;
+  }
+
+  // Unlock cards
+  bossAttacking = false;
+  document.querySelectorAll('.boss-item-card').forEach(c => c.classList.remove('battle-locked'));
+}
+
+async function endBossBattle(playerWon) {
+  bossGameOver  = true;
+  bossAttacking = false;
+  $('boss-attack-section').style.display = 'none';
+
+  const gameover = $('boss-gameover');
+  gameover.classList.remove('hidden');
+
+  if (playerWon) {
+    addBossLog('🏆 VICTORY! The Dragon Boss has been defeated!', 'info');
+    gameover.innerHTML = `
+      <div class="boss-gameover-icon">🏆</div>
+      <div class="boss-gameover-title">Victory!</div>
+      <div class="boss-gameover-msg">You defeated the mighty Dragon Boss! Amazing!</div>
+      <div class="boss-gameover-reward" id="boss-reward-display">🪙 Claiming your reward...</div>
+      <button class="btn btn-gold btn-large" id="boss-play-again-btn">⚔️ Fight Again!</button>
+      <button class="btn btn-purple" id="boss-go-roll-btn2">🎲 Back to Roll</button>
+    `;
+    document.getElementById('boss-play-again-btn').addEventListener('click', () => goToBossScreen());
+    document.getElementById('boss-go-roll-btn2').addEventListener('click', goToRollScreen);
+
+    // Claim backend reward
+    try {
+      const { status, data } = await apiPost(`/users/${currentUser.id}/boss-reward`, {});
+      if (status === 200) {
+        currentUser = data.user;
+        updateBalances();
+        document.getElementById('boss-reward-display').textContent = `🪙 +${data.reward} coins earned!`;
+      } else if (status === 429) {
+        document.getElementById('boss-reward-display').textContent = `⏳ Already claimed today — try again later!`;
+      } else {
+        document.getElementById('boss-reward-display').textContent = `🎉 Victory is its own reward!`;
+      }
+    } catch (err) {
+      document.getElementById('boss-reward-display').textContent = `🎉 You are a Dragon Trainer!`;
+    }
+
+  } else {
+    addBossLog('💀 Defeated... The Dragon Boss wins this round!', 'info');
+    gameover.innerHTML = `
+      <div class="boss-gameover-icon">💀</div>
+      <div class="boss-gameover-title">Defeated!</div>
+      <div class="boss-gameover-msg">The Dragon Boss was too powerful! Craft more items and try again!</div>
+      <button class="btn btn-gold btn-large" id="boss-play-again-btn2">⚔️ Try Again!</button>
+      <button class="btn btn-purple" id="boss-go-craft-btn">🔨 Craft Items</button>
+    `;
+    document.getElementById('boss-play-again-btn2').addEventListener('click', () => goToBossScreen());
+    document.getElementById('boss-go-craft-btn').addEventListener('click', goToCraftScreen);
+  }
+}
+
+// ============================================================
 //  EVENT LISTENERS
 // ============================================================
 function handleLogout() {
@@ -1470,6 +1714,27 @@ function attachListeners() {
 
   // Craft grid — craft button
   $('craft-grid').addEventListener('click', handleCraft);
+
+  // Boss Fight — nav links TO boss from all screens
+  $('nav-boss-from-roll').addEventListener('click',   e => { e.preventDefault(); goToBossScreen(); });
+  $('nav-boss-from-market').addEventListener('click', e => { e.preventDefault(); goToBossScreen(); });
+  $('nav-boss-from-inv').addEventListener('click',    e => { e.preventDefault(); goToBossScreen(); });
+  $('nav-boss-from-lb').addEventListener('click',     e => { e.preventDefault(); goToBossScreen(); });
+  $('nav-boss-from-craft').addEventListener('click',  e => { e.preventDefault(); goToBossScreen(); });
+  $('nav-boss-from-create').addEventListener('click', e => { e.preventDefault(); goToBossScreen(); });
+
+  // Boss Fight — nav links FROM boss screen
+  $('nav-roll-from-boss').addEventListener('click',       e => { e.preventDefault(); goToRollScreen(); });
+  $('nav-market-from-boss').addEventListener('click',     e => { e.preventDefault(); goToMarketScreen(); });
+  $('nav-inventory-from-boss').addEventListener('click',  e => { e.preventDefault(); goToInventoryScreen(); });
+  $('nav-leaderboard-from-boss').addEventListener('click',e => { e.preventDefault(); goToLeaderboardScreen(); });
+  $('nav-craft-from-boss').addEventListener('click',      e => { e.preventDefault(); goToCraftScreen(); });
+  $('nav-create-from-boss').addEventListener('click',     e => { e.preventDefault(); goToCreateScreen(); });
+
+  // Boss Fight — combat and controls
+  $('boss-items-grid').addEventListener('click', handleBossItemClick);
+  $('boss-flee-btn').addEventListener('click', () => { goToRollScreen(); });
+  $('boss-go-market-btn').addEventListener('click', goToMarketScreen);
 
   // Create screen
   $('create-sacrifice-grid').addEventListener('click', handleSacrificeToggle);
