@@ -61,9 +61,10 @@ router.post('/login', (req, res) => {
     return res.json({ user: existing, created: false });
   }
 
+  const STARTING_COINS = 10;
   const result = db.prepare(
-    'INSERT INTO users (username, coins) VALUES (?, 0)'
-  ).run(username);
+    'INSERT INTO users (username, coins) VALUES (?, ?)'
+  ).run(username, STARTING_COINS);
 
   const newUser = db.prepare('SELECT * FROM users WHERE id = ?').get(result.lastInsertRowid);
   return res.status(201).json({ user: newUser, created: true });
