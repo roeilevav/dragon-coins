@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dragon Coins 🐉</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ========== LOGIN SCREEN ========== -->
+  <div id="screen-login" class="screen active">
+    <div class="login-card">
+      <div class="dragon-logo">🐉</div>
+      <h1>Dragon Coins</h1>
+      <p class="subtitle">Collect coins, visit merchants,<br>become the richest dragon trainer!</p>
+      <form id="login-form">
+        <label for="username-input">Choose your username</label>
+        <input
+          id="username-input"
+          type="text"
+          maxlength="10"
+          placeholder="E.g. DragonKid"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <p class="input-hint">Up to 10 letters and numbers only</p>
+        <div id="login-error" class="error-msg hidden"></div>
+        <button type="submit" class="btn btn-primary btn-large">
+          Let's Play! 🐉
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========== ROLL SCREEN ========== -->
+  <div id="screen-roll" class="screen">
+    <header class="top-bar">
+      <div class="user-info">
+        <span id="roll-username" class="username-tag"></span>
+        <span class="balance" id="roll-balance">🪙 0</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#" id="nav-craft-from-roll">🔨 Craft</a>
+        <a href="#" id="nav-create-from-roll">🎨 Create</a>
+      </nav>
+      <button class="btn btn-logout logout-btn">🚪 Logout</button>
+    </header>
+
+    <main class="roll-main">
+      <h2>Roll for Dragon Coins!</h2>
+
+      <div id="roll-result" class="roll-result hidden"></div>
+
+      <button id="roll-btn" class="btn btn-gold btn-giant">
+        🎲 Roll!
+      </button>
+
+      <div id="cooldown-display" class="cooldown hidden">
+        ⏳ Next roll in: <span id="cooldown-timer">00:00</span>
+      </div>
+
+      <button id="go-market-btn" class="btn btn-purple btn-large hidden">
+        🛒 Go to Market
+      </button>
+    </main>
+  </div>
+
+  <!-- ========== MARKET SCREEN ========== -->
+  <div id="screen-market" class="screen">
+    <header class="top-bar">
+      <div class="user-info">
+        <span id="market-username" class="username-tag"></span>
+        <span class="balance" id="market-balance">🪙 0</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#" id="nav-roll-from-market">🎲 Roll</a>
+        <a href="#" id="nav-inventory">🎒 Inventory</a>
+        <a href="#" id="nav-leaderboard">🏆 Leaderboard</a>
+        <a href="#" id="nav-craft-from-market">🔨 Craft</a>
+        <a href="#" id="nav-create-from-market">🎨 Create</a>
+      </nav>
+      <button class="btn btn-logout logout-btn">🚪 Logout</button>
+    </header>
+
+    <main class="market-main">
+      <h2>🛍️ Dragon Market</h2>
+      <p class="market-subtitle">Prices change every visit — shop fast!</p>
+      <div id="merchant-grid" class="merchant-grid"></div>
+
+      <section id="player-listings-section" class="player-listings-section hidden">
+        <h3>🤝 Player Listings</h3>
+        <div id="player-listings-grid" class="merchant-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ========== INVENTORY SCREEN ========== -->
+  <div id="screen-inventory" class="screen">
+    <header class="top-bar">
+      <div class="user-info">
+        <span id="inv-username" class="username-tag"></span>
+        <span class="balance" id="inv-balance">🪙 0</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#" id="nav-roll-from-inv">🎲 Roll</a>
+        <a href="#" id="nav-market-from-inv">🛍️ Market</a>
+        <a href="#" id="nav-leaderboard-from-inv">🏆 Leaderboard</a>
+        <a href="#" id="nav-craft-from-inv">🔨 Craft</a>
+        <a href="#" id="nav-create-from-inv">🎨 Create</a>
+      </nav>
+      <button class="btn btn-logout logout-btn">🚪 Logout</button>
+    </header>
+
+    <main class="inventory-main">
+      <h2>🎒 Your Inventory</h2>
+      <div id="inventory-grid" class="inventory-grid"></div>
+    </main>
+  </div>
+
+  <!-- ========== LEADERBOARD SCREEN ========== -->
+  <div id="screen-leaderboard" class="screen">
+    <header class="top-bar">
+      <div class="user-info">
+        <span id="lb-username" class="username-tag"></span>
+        <span class="balance" id="lb-balance">🪙 0</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#" id="nav-roll-from-lb">🎲 Roll</a>
+        <a href="#" id="nav-market-from-lb">🛍️ Market</a>
+        <a href="#" id="nav-inventory-from-lb">🎒 Inventory</a>
+        <a href="#" id="nav-craft-from-lb">🔨 Craft</a>
+        <a href="#" id="nav-create-from-lb">🎨 Create</a>
+      </nav>
+      <button class="btn btn-logout logout-btn">🚪 Logout</button>
+    </header>
+
+    <main class="leaderboard-main">
+      <h2>🏆 Top Dragon Trainers</h2>
+      <div id="leaderboard-table" class="leaderboard-table"></div>
+    </main>
+  </div>
+
+  <!-- ========== CRAFT SCREEN ========== -->
+  <div id="screen-craft" class="screen">
+    <header class="top-bar">
+      <div class="user-info">
+        <span id="craft-username" class="username-tag"></span>
+        <span class="balance" id="craft-balance">🪙 0</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#" id="nav-roll-from-craft">🎲 Roll</a>
+        <a href="#" id="nav-market-from-craft">🛍️ Market</a>
+        <a href="#" id="nav-inventory-from-craft">🎒 Inventory</a>
+        <a href="#" id="nav-leaderboard-from-craft">🏆 Leaderboard</a>
+        <a href="#" id="nav-create-from-craft">🎨 Create</a>
+      </nav>
+      <button class="btn btn-logout logout-btn">🚪 Logout</button>
+    </header>
+
+    <main class="craft-main">
+      <h2>🔨 Craft Shop</h2>
+      <p class="craft-subtitle">Combine items from the market to forge rare treasures you can't buy anywhere!</p>
+      <div id="craft-grid" class="craft-grid"></div>
+    </main>
+  </div>
+
+  <!-- ========== CREATE SCREEN ========== -->
+  <div id="screen-create" class="screen">
+    <header class="top-bar">
+      <div class="user-info">
+        <span id="create-username" class="username-tag"></span>
+        <span class="balance" id="create-balance">🪙 0</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#" id="nav-roll-from-create">🎲 Roll</a>
+        <a href="#" id="nav-market-from-create">🛍️ Market</a>
+        <a href="#" id="nav-inventory-from-create">🎒 Inventory</a>
+        <a href="#" id="nav-leaderboard-from-create">🏆 Leaderboard</a>
+        <a href="#" id="nav-craft-from-create">🔨 Craft</a>
+      </nav>
+      <button class="btn btn-logout logout-btn">🚪 Logout</button>
+    </header>
+
+    <main class="create-main">
+      <h2>🎨 Create Your Item</h2>
+      <p class="create-subtitle">Exchange <strong>5 crafted items</strong> to forge your own one-of-a-kind creation</p>
+
+      <!-- Not enough crafted items -->
+      <div id="create-locked" class="create-locked hidden">
+        <div class="create-locked-icon">🔒</div>
+        <p>You need <strong>5 crafted items</strong> to unlock this.</p>
+        <p class="create-locked-hint">You currently have <span id="create-crafted-count">0</span> crafted item(s). Head to the <strong>Craft</strong> page to make more!</p>
+      </div>
+
+      <!-- Main creation form -->
+      <div id="create-form-wrap" class="hidden">
+        <!-- Step 1: pick 5 crafted items -->
+        <section class="create-section">
+          <h3 class="create-section-title">Step 1 — Choose 5 crafted items to sacrifice</h3>
+          <p class="create-section-hint">Selected: <span id="create-selected-count">0</span> / 5</p>
+          <div id="create-sacrifice-grid" class="create-sacrifice-grid"></div>
+        </section>
+
+        <!-- Step 2: item details -->
+        <section class="create-section">
+          <h3 class="create-section-title">Step 2 — Describe your creation</h3>
+
+          <div class="create-field">
+            <label class="create-label">Item Image</label>
+            <div class="create-image-area" id="create-image-area">
+              <img id="create-img-preview" class="create-img-preview hidden" src="" alt="preview" />
+              <div id="create-img-placeholder" class="create-img-placeholder">
+                <span>📷</span>
+                <span>Click to upload image</span>
+              </div>
+              <input type="file" id="create-img-input" accept="image/*" class="create-img-hidden-input" />
+            </div>
+          </div>
+
+          <div class="create-field">
+            <label class="create-label" for="create-item-name">Item Name</label>
+            <input type="text" id="create-item-name" class="create-text-input"
+                   maxlength="40" placeholder="e.g. Thundersteel Gauntlet" />
+          </div>
+
+          <div class="create-field">
+            <label class="create-label" for="create-creator-name">Creator Name</label>
+            <input type="text" id="create-creator-name" class="create-text-input"
+                   maxlength="30" placeholder="Your name or a title" />
+          </div>
+
+          <div class="create-field">
+            <label class="create-label">Creation Date</label>
+            <div class="create-date-display" id="create-date-display"></div>
+          </div>
+        </section>
+
+        <button id="create-submit-btn" class="btn btn-gold create-submit-btn" disabled>
+          🎨 Forge Item
+        </button>
+        <p id="create-submit-hint" class="create-submit-hint">Select 5 items, add image, name &amp; creator to unlock</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- ========== QUIZ MODAL ========== -->
+  <div id="quiz-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="quiz-badge">🧠 Answer correctly for 40% off!</div>
+      <p id="quiz-question" class="quiz-question"></p>
+      <div id="quiz-options" class="quiz-options"></div>
+      <div id="quiz-result" class="quiz-result hidden">
+        <p id="quiz-result-msg" class="quiz-result-msg"></p>
+        <p id="quiz-price-display" class="quiz-price-display"></p>
+        <div class="quiz-actions">
+          <button id="quiz-confirm-btn" class="btn btn-green btn-large">Buy ✨</button>
+          <button id="quiz-cancel-btn" class="btn btn-purple">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buy success toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
