@@ -52,11 +52,21 @@
     <main class="roll-main">
       <h2>Roll for Dragon Coins!</h2>
 
+      <p class="roll-cost-hint">Each roll costs <strong>🪙 5</strong> — answer correctly to win coins!</p>
+
       <div id="roll-result" class="roll-result hidden"></div>
 
       <button id="roll-btn" class="btn btn-gold btn-giant">
-        🎲 Roll!
+        🎲 Roll (🪙 5)
       </button>
+
+      <!-- Quiz question area (shown after clicking roll) -->
+      <div id="roll-quiz" class="roll-quiz hidden">
+        <div class="roll-quiz-badge">🧠 Answer to claim your reward!</div>
+        <p id="roll-quiz-question" class="roll-quiz-question"></p>
+        <div id="roll-quiz-options" class="roll-quiz-options"></div>
+        <div id="roll-quiz-result" class="roll-quiz-result hidden"></div>
+      </div>
 
       <div id="cooldown-display" class="cooldown hidden">
         ⏳ Next roll in: <span id="cooldown-timer">00:00</span>

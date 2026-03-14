@@ -361,6 +361,7 @@ const QUIZ_QUESTIONS = [
 let currentUser    = null;
 let countdownInterval = null;
 let pendingPurchase = null; // set when quiz opens
+let pendingRollToken = null; // token from /roll/start
 
 // ============================================================
 //  DOM HELPERS
@@ -446,22 +447,30 @@ async function handleLogin(e) {
 // ============================================================
 //  ROLL SCREEN
 // ============================================================
+const ROLL_COST    = 5;
+const COOLDOWN_SEC = 60; // must match backend
+
 function goToRollScreen() {
   updateBalances();
+  $('roll-quiz').classList.add('hidden');
+  $('roll-quiz-result').classList.add('hidden');
   renderRollState();
   showScreen('roll');
 }
 
 function renderRollState() {
-  const btn            = $('roll-btn');
+  const btn             = $('roll-btn');
   const cooldownDisplay = $('cooldown-display');
   const marketBtn       = $('go-market-btn');
 
   if (currentUser.last_roll_at) marketBtn.classList.remove('hidden');
 
+  // Disable roll if not enough coins
+  const canAfford = currentUser.coins >= ROLL_COST;
+
   if (currentUser.last_roll_at) {
     const lastRoll  = new Date(currentUser.last_roll_at).getTime();
-    const remaining = 20 * 1000 - (Date.now() - lastRoll);
+    const remaining = COOLDOWN_SEC * 1000 - (Date.now() - lastRoll);
     if (remaining > 0) {
       btn.disabled = true;
       cooldownDisplay.classList.remove('hidden');
@@ -470,7 +479,12 @@ function renderRollState() {
     }
   }
 
-  btn.disabled = false;
+  btn.disabled = !canAfford;
+  if (!canAfford) {
+    btn.textContent = '🎲 Not enough coins!';
+  } else {
+    btn.textContent = `🎲 Roll (🪙 ${ROLL_COST})`;
+  }
   cooldownDisplay.classList.add('hidden');
   clearInterval(countdownInterval);
 }
@@ -483,9 +497,10 @@ function startCountdown(remainingMs) {
     const left = end - Date.now();
     if (left <= 0) {
       clearInterval(countdownInterval);
-      $('roll-btn').disabled = false;
       $('cooldown-display').classList.add('hidden');
       $('roll-result').classList.add('hidden');
+      $('roll-quiz').classList.add('hidden');
+      renderRollState(); // re-check affordability
     } else {
       renderCountdown(left);
     }
@@ -499,30 +514,104 @@ function renderCountdown(ms) {
     `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
+// Step 1: Player clicks Roll → pay 5 coins, get a question
 async function handleRoll() {
   const btn = $('roll-btn');
   btn.disabled = true;
+  $('roll-result').classList.add('hidden');
+  $('roll-quiz').classList.add('hidden');
+  $('roll-quiz-result').classList.add('hidden');
 
   try {
-    const { status, data } = await apiPost(`/users/${currentUser.id}/roll`, {});
+    const { status, data } = await apiPost(`/users/${currentUser.id}/roll/start`, {});
+
     if (status === 429) {
-      currentUser.last_roll_at = new Date(Date.now() - (20 * 1000 - data.remaining_ms)).toISOString();
+      currentUser.last_roll_at = new Date(Date.now() - (COOLDOWN_SEC * 1000 - data.remaining_ms)).toISOString();
       startCountdown(data.remaining_ms);
       $('cooldown-display').classList.remove('hidden');
       return;
     }
-    if (status !== 200) { showToast('Something went wrong. Try again!', true); btn.disabled = false; return; }
+    if (status === 402) {
+      showToast(data.error || 'Not enough coins!', true);
+      btn.disabled = false;
+      return;
+    }
+    if (status !== 200) {
+      showToast('Something went wrong. Try again!', true);
+      btn.disabled = false;
+      return;
+    }
 
+    // Update balance (5 coins deducted)
     currentUser = data.user;
     updateBalances();
-    $('roll-result').textContent = `You got ${data.earned} Dragon Coins! 🎉`;
-    $('roll-result').classList.remove('hidden');
+    pendingRollToken = data.token;
+
+    // Show the quiz question
+    $('roll-quiz-question').textContent = data.question;
+    const optsEl = $('roll-quiz-options');
+    optsEl.innerHTML = data.options.map((opt, i) =>
+      `<button class="roll-quiz-opt-btn" data-index="${i}">${opt}</button>`
+    ).join('');
+    $('roll-quiz').classList.remove('hidden');
     $('go-market-btn').classList.remove('hidden');
-    startCountdown(20 * 1000);
-    $('cooldown-display').classList.remove('hidden');
+
   } catch (err) {
     showToast('Could not reach server!', true);
     btn.disabled = false;
+  }
+}
+
+// Step 2: Player picks an answer → send to server
+async function handleRollQuizAnswer(e) {
+  const btn = e.target.closest('.roll-quiz-opt-btn');
+  if (!btn || !pendingRollToken) return;
+
+  const answerIdx = parseInt(btn.dataset.index, 10);
+
+  // Disable all quiz buttons
+  document.querySelectorAll('.roll-quiz-opt-btn').forEach(b => { b.disabled = true; });
+
+  try {
+    const { status, data } = await apiPost(`/users/${currentUser.id}/roll/answer`, {
+      token: pendingRollToken,
+      answer: answerIdx,
+    });
+    pendingRollToken = null;
+
+    if (status !== 200) {
+      showToast(data.error || 'Answer failed!', true);
+      startCountdown(COOLDOWN_SEC * 1000);
+      $('cooldown-display').classList.remove('hidden');
+      return;
+    }
+
+    // Highlight correct / wrong
+    document.querySelectorAll('.roll-quiz-opt-btn').forEach(b => {
+      const idx = parseInt(b.dataset.index, 10);
+      if (idx === data.correctIndex) b.classList.add('correct');
+      else if (b === btn && !data.correct) b.classList.add('wrong');
+    });
+
+    currentUser = data.user;
+    updateBalances();
+
+    // Show result message
+    const resultEl = $('roll-quiz-result');
+    if (data.correct) {
+      resultEl.innerHTML = `<span class="roll-quiz-correct">🎉 Correct! You earned <strong>🪙 ${data.earned}</strong> Dragon Coins!</span>`;
+    } else {
+      resultEl.innerHTML = `<span class="roll-quiz-wrong">❌ Wrong! You lost <strong>🪙 ${data.lost}</strong> coins. Better luck next time!</span>`;
+    }
+    resultEl.classList.remove('hidden');
+    $('roll-result').classList.add('hidden');
+
+    startCountdown(COOLDOWN_SEC * 1000);
+    $('cooldown-display').classList.remove('hidden');
+
+  } catch (err) {
+    showToast('Could not reach server!', true);
+    pendingRollToken = null;
   }
 }
 
@@ -1207,6 +1296,7 @@ function handleLogout() {
 function attachListeners() {
   $('login-form').addEventListener('submit', handleLogin);
   $('roll-btn').addEventListener('click', handleRoll);
+  $('roll-quiz-options').addEventListener('click', handleRollQuizAnswer);
 
   // Logout buttons (one per screen, use class delegation on document)
   document.addEventListener('click', e => {
