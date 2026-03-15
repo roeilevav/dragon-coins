@@ -733,7 +733,17 @@ function showQuizModal(purchase) {
   // purchase = { type:'merchant'|'listing', itemName, merchantName, basePrice, listingId, btn }
   pendingPurchase = purchase;
 
-  const q = QUIZ_QUESTIONS[Math.floor(Math.random() * QUIZ_QUESTIONS.length)];
+  // Pick a question the user hasn't seen yet in the purchase quiz; reset when all done
+  const PURCHASE_Q_KEY = `seenPurchaseQ_${currentUser.username}`;
+  let seenPQ = [];
+  try { seenPQ = JSON.parse(localStorage.getItem(PURCHASE_Q_KEY) || '[]'); } catch (e) { seenPQ = []; }
+  if (!Array.isArray(seenPQ)) seenPQ = [];
+  let availablePQ = QUIZ_QUESTIONS.map((_, i) => i).filter(i => !seenPQ.includes(i));
+  if (availablePQ.length === 0) { seenPQ = []; availablePQ = QUIZ_QUESTIONS.map((_, i) => i); }
+  const pqi = availablePQ[Math.floor(Math.random() * availablePQ.length)];
+  seenPQ.push(pqi);
+  localStorage.setItem(PURCHASE_Q_KEY, JSON.stringify(seenPQ));
+  const q = QUIZ_QUESTIONS[pqi];
 
   $('quiz-question').textContent = q.q;
   $('quiz-result').classList.add('hidden');

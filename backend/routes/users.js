@@ -208,9 +208,22 @@ router.post('/:id/roll/start', (req, res) => {
   db.prepare('UPDATE users SET coins = coins - ?, last_roll_at = ? WHERE id = ?')
     .run(ROLL_COST, nowISO, userId);
 
-  // Pick random question
-  const qi    = Math.floor(Math.random() * QUIZ_POOL.length);
-  const q     = QUIZ_POOL[qi];
+  // Pick a question the user hasn't seen yet; reset when all have been shown
+  let seen = [];
+  try { seen = JSON.parse(user.seen_questions || '[]'); } catch (e) { seen = []; }
+  if (!Array.isArray(seen)) seen = [];
+
+  let available = QUIZ_POOL.map((_, i) => i).filter(i => !seen.includes(i));
+  if (available.length === 0) {
+    seen = [];  // reset — user has seen every question
+    available = QUIZ_POOL.map((_, i) => i);
+  }
+
+  const qi  = available[Math.floor(Math.random() * available.length)];
+  const q   = QUIZ_POOL[qi];
+  seen.push(qi);
+  db.prepare("UPDATE users SET seen_questions = ? WHERE id = ?").run(JSON.stringify(seen), userId);
+
   const earned = Math.floor(Math.random() * 41) + 40; // 40–80
 
   // Generate token
