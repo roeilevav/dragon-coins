@@ -2176,6 +2176,118 @@ async function endBossBattle(playerWon) {
 }
 
 // ============================================================
+//  TUTORIAL
+// ============================================================
+const TUTORIAL_SLIDES = [
+  {
+    icon: '🏙️',
+    title: 'Welcome to Magic City!',
+    color: '#7C3AED',
+    text: 'Magic City is a quiz-powered coin-collecting adventure. Answer trivia questions to earn coins, buy magical items from merchants, craft rare treasures, and challenge the fearsome Dragon Boss!',
+  },
+  {
+    icon: '🎲',
+    title: 'Roll for Coins',
+    color: '#D97706',
+    text: 'Press <strong>🎲 Roll</strong> (costs 🪙5) to start earning. A trivia question appears — answer <strong>correctly</strong> to win big coins! Answer wrong and you lose a small amount. There\'s a short cooldown between rolls.',
+  },
+  {
+    icon: '🛒',
+    title: 'The Market',
+    color: '#059669',
+    text: 'Spend your coins on magical items from merchants. <strong>Prices change every visit</strong>, so shop fast! Before buying, answer a quiz question — correct = <strong>40% discount!</strong> Hire extra merchant slots for even more variety.',
+  },
+  {
+    icon: '🎒',
+    title: 'Your Inventory',
+    color: '#2563EB',
+    text: 'All your items live here — purchased, crafted, and custom. You can <strong>list any item for sale</strong> to other players at whatever price you set, or unlist it anytime.',
+  },
+  {
+    icon: '🔨',
+    title: 'Craft Shop',
+    color: '#92400E',
+    text: 'Combine <strong>3 specific market items</strong> to forge rare crafted items you can\'t buy anywhere! Green badges ✅ = ingredients you already own. Red badges ❌ = still needed. Crafted items deal extra damage in Boss fights.',
+  },
+  {
+    icon: '🎨',
+    title: 'Create Your Item',
+    color: '#BE185D',
+    text: 'Sacrifice <strong>5 crafted items</strong> to forge your very own one-of-a-kind creation. Upload an image, give it a name and creator title. Your custom item lives in your inventory forever — and has the <strong>highest boss power</strong> of all!',
+  },
+  {
+    icon: '⚔️',
+    title: 'Boss Fight',
+    color: '#DC2626',
+    text: 'Pay a small entry fee and enter the Dragon\'s Lair! Pick items from your inventory to attack — each shows its boss power (⚔️ +X%). <strong>Crafted items hit harder, custom items hardest.</strong> Win = big coin reward. The boss levels up every time you beat it!',
+  },
+  {
+    icon: '🏆',
+    title: 'Leaderboard',
+    color: '#B45309',
+    text: 'See who\'s the richest player in Magic City! Rankings are based on total points earned. Roll more, buy smarter, craft everything, and beat the boss to climb to <strong>#1</strong>!',
+  },
+  {
+    icon: '💬',
+    title: 'Chat',
+    color: '#0891B2',
+    text: 'Search for other players by username and send them messages. Tap any conversation in your inbox to open it — messages appear in <strong>real time</strong>. Stay connected with your fellow dragon trainers!',
+  },
+];
+
+let tutorialCurrentSlide = 0;
+
+function openTutorial() {
+  tutorialCurrentSlide = 0;
+  renderTutorialSlide();
+  $('tutorial-modal').classList.remove('hidden');
+}
+
+function closeTutorial() {
+  $('tutorial-modal').classList.add('hidden');
+}
+
+function renderTutorialSlide() {
+  const slide = TUTORIAL_SLIDES[tutorialCurrentSlide];
+  const total = TUTORIAL_SLIDES.length;
+
+  $('tutorial-slide-content').innerHTML = `
+    <div class="tutorial-icon" style="color:${slide.color}">${slide.icon}</div>
+    <h3 class="tutorial-title" style="color:${slide.color}">${slide.title}</h3>
+    <p class="tutorial-text">${slide.text}</p>
+  `;
+
+  // Render dots
+  $('tutorial-dots').innerHTML = TUTORIAL_SLIDES.map((_, i) =>
+    `<span class="tutorial-dot ${i === tutorialCurrentSlide ? 'active' : ''}" data-i="${i}"></span>`
+  ).join('');
+  $('tutorial-dots').querySelectorAll('.tutorial-dot').forEach(dot => {
+    dot.addEventListener('click', () => {
+      tutorialCurrentSlide = parseInt(dot.dataset.i, 10);
+      renderTutorialSlide();
+    });
+  });
+
+  // Step counter
+  $('tutorial-step-label').textContent = `${tutorialCurrentSlide + 1} / ${total}`;
+
+  // Prev button visibility
+  $('tutorial-prev-btn').style.visibility = tutorialCurrentSlide === 0 ? 'hidden' : 'visible';
+
+  // Next button — last slide becomes "Let's Play!"
+  const nextBtn = $('tutorial-next-btn');
+  if (tutorialCurrentSlide === total - 1) {
+    nextBtn.textContent = "🎮 Let's Play!";
+    nextBtn.classList.remove('btn-gold');
+    nextBtn.classList.add('btn-green');
+  } else {
+    nextBtn.textContent = 'Next →';
+    nextBtn.classList.remove('btn-green');
+    nextBtn.classList.add('btn-gold');
+  }
+}
+
+// ============================================================
 //  EVENT LISTENERS
 // ============================================================
 function handleLogout() {
@@ -2464,6 +2576,18 @@ function attachListeners() {
   $('create-item-name').addEventListener('input', updateCreateSubmitState);
   $('create-creator-name').addEventListener('input', updateCreateSubmitState);
   $('create-submit-btn').addEventListener('click', handleCreateSubmit);
+
+  // Tutorial
+  $('tutorial-open-btn').addEventListener('click', openTutorial);
+  $('tutorial-close-btn').addEventListener('click', closeTutorial);
+  $('tutorial-modal').addEventListener('click', e => { if (e.target === $('tutorial-modal')) closeTutorial(); });
+  $('tutorial-prev-btn').addEventListener('click', () => {
+    if (tutorialCurrentSlide > 0) { tutorialCurrentSlide--; renderTutorialSlide(); }
+  });
+  $('tutorial-next-btn').addEventListener('click', () => {
+    if (tutorialCurrentSlide < TUTORIAL_SLIDES.length - 1) { tutorialCurrentSlide++; renderTutorialSlide(); }
+    else closeTutorial();
+  });
 }
 
 // ============================================================
