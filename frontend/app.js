@@ -1993,69 +1993,118 @@ async function endBossBattle(playerWon) {
 }
 
 // ============================================================
-//  TUTORIAL
+//  TUTORIAL  (EN / HE / ES / FR)
 // ============================================================
-const TUTORIAL_SLIDES = [
-  {
-    icon: '🏙️',
-    title: 'Welcome to Magic City!',
-    color: '#7C3AED',
-    text: 'Magic City is a quiz-powered coin-collecting adventure. Answer trivia questions to earn coins, buy magical items from merchants, craft rare treasures, and challenge the fearsome Dragon Boss!',
-  },
-  {
-    icon: '🎲',
-    title: 'Roll for Coins',
-    color: '#D97706',
-    text: 'Press <strong>🎲 Roll</strong> (costs 🪙5) to start earning. A trivia question appears — answer <strong>correctly</strong> to win big coins! Answer wrong and you lose a small amount. There\'s a short cooldown between rolls.',
-  },
-  {
-    icon: '🛒',
-    title: 'The Market',
-    color: '#059669',
-    text: 'Spend your coins on magical items from merchants. <strong>Prices change every visit</strong>, so shop fast! Before buying, answer a quiz question — correct = <strong>40% discount!</strong> Hire extra merchant slots for even more variety.',
-  },
-  {
-    icon: '🎒',
-    title: 'Your Inventory',
-    color: '#2563EB',
-    text: 'All your items live here — purchased, crafted, and custom. You can <strong>list any item for sale</strong> to other players at whatever price you set, or unlist it anytime.',
-  },
-  {
-    icon: '🔨',
-    title: 'Craft Shop',
-    color: '#92400E',
-    text: 'Combine <strong>3 specific market items</strong> to forge rare crafted items you can\'t buy anywhere! Green badges ✅ = ingredients you already own. Red badges ❌ = still needed. Crafted items deal extra damage in Boss fights.',
-  },
-  {
-    icon: '🎨',
-    title: 'Create Your Item',
-    color: '#BE185D',
-    text: 'Sacrifice <strong>5 crafted items</strong> to forge your very own one-of-a-kind creation. Upload an image, give it a name and creator title. Your custom item lives in your inventory forever — and has the <strong>highest boss power</strong> of all!',
-  },
-  {
-    icon: '⚔️',
-    title: 'Boss Fight',
-    color: '#DC2626',
-    text: 'Pay a small entry fee and enter the Dragon\'s Lair! Pick items from your inventory to attack — each shows its boss power (⚔️ +X%). <strong>Crafted items hit harder, custom items hardest.</strong> Win = big coin reward. The boss levels up every time you beat it!',
-  },
-  {
-    icon: '🏆',
-    title: 'Leaderboard',
-    color: '#B45309',
-    text: 'See who\'s the richest player in Magic City! Rankings are based on total points earned. Roll more, buy smarter, craft everything, and beat the boss to climb to <strong>#1</strong>!',
-  },
-  {
-    icon: '💬',
-    title: 'Chat',
-    color: '#0891B2',
-    text: 'Search for other players by username and send them messages. Tap any conversation in your inbox to open it — messages appear in <strong>real time</strong>. Stay connected with your fellow dragon trainers!',
-  },
-];
+const TUTORIAL_TRANSLATIONS = {
+  en: [
+    { icon: '🏙️', color: '#7C3AED', title: 'Welcome to Magic City!',
+      text: 'Magic City is a quiz-powered coin-collecting adventure. Answer trivia questions to earn coins, buy magical items from merchants, craft rare treasures, and challenge the fearsome Dragon Boss!' },
+    { icon: '🎲', color: '#D97706', title: 'Roll for Coins',
+      text: 'Press <strong>🎲 Roll</strong> (costs 🪙5) to start earning. A trivia question appears — answer <strong>correctly</strong> to win big coins! Answer wrong and you lose a small amount. There\'s a short cooldown between rolls.' },
+    { icon: '🛒', color: '#059669', title: 'The Market',
+      text: 'Spend your coins on magical items from merchants. <strong>Prices change every visit</strong>, so shop fast! Before buying, answer a quiz question — correct = <strong>40% discount!</strong> Hire extra merchant slots for even more variety.' },
+    { icon: '🎒', color: '#2563EB', title: 'Your Inventory',
+      text: 'All your items live here — purchased, crafted, and custom. You can <strong>list any item for sale</strong> to other players at whatever price you set, or unlist it anytime.' },
+    { icon: '🔨', color: '#92400E', title: 'Craft Shop',
+      text: 'Combine <strong>3 specific market items</strong> to forge rare crafted items you can\'t buy anywhere! Green badges ✅ = ingredients you already own. Red badges ❌ = still needed. Crafted items deal extra damage in Boss fights.' },
+    { icon: '🎨', color: '#BE185D', title: 'Create Your Item',
+      text: 'Sacrifice <strong>5 crafted items</strong> to forge your very own one-of-a-kind creation. Upload an image, give it a name and creator title. Your custom item lives in your inventory forever — and has the <strong>highest boss power</strong> of all!' },
+    { icon: '⚔️', color: '#DC2626', title: 'Boss Fight',
+      text: 'Pay a small entry fee and enter the Dragon\'s Lair! Pick items from your inventory to attack — each shows its boss power (⚔️ +X%). <strong>Crafted items hit harder, custom items hardest.</strong> Win = big coin reward. The boss levels up every time you beat it!' },
+    { icon: '🏆', color: '#B45309', title: 'Leaderboard',
+      text: 'See who\'s the richest player in Magic City! Rankings are based on total points earned. Roll more, buy smarter, craft everything, and beat the boss to climb to <strong>#1</strong>!' },
+    { icon: '💬', color: '#0891B2', title: 'Chat',
+      text: 'Search for other players by username and send them messages. Tap any conversation in your inbox to open it — messages appear in <strong>real time</strong>. Stay connected with your fellow dragon trainers!' },
+  ],
+  he: [
+    { icon: '🏙️', color: '#7C3AED', title: 'ברוכים הבאים לעיר הקסם!',
+      text: 'עיר הקסם היא הרפתקת טריוויה לאיסוף מטבעות. ענה על שאלות, קנה פריטים קסומים ממוכרים, יצור אוצרות נדירים, והתמודד עם הבוס הנורא!' },
+    { icon: '🎲', color: '#D97706', title: 'גלגל למטבעות',
+      text: 'לחץ על <strong>🎲 גלגל</strong> (עולה 🪙5). שאלת טריוויה מופיעה — ענה <strong>נכון</strong> כדי לזכות בהרבה מטבעות! ענה לא נכון ותאבד מעט. יש המתנה קצרה בין גלגולים.' },
+    { icon: '🛒', color: '#059669', title: 'השוק',
+      text: 'בזבז מטבעות על פריטים קסומים ממוכרים. <strong>המחירים משתנים בכל ביקור</strong>, אז קנה מהר! לפני קנייה, ענה על שאלת טריוויה — נכון = <strong>הנחה של 40%!</strong> שכור עמדות מוכר נוספות לגיוון.' },
+    { icon: '🎒', color: '#2563EB', title: 'המלאי שלך',
+      text: 'כל הפריטים שלך נמצאים כאן — שנקנו, יוצרו ומותאמים. ניתן <strong>להציע כל פריט למכירה</strong> לשחקנים אחרים בכל מחיר, או לבטל בכל עת.' },
+    { icon: '🔨', color: '#92400E', title: 'חנות היצירה',
+      text: 'שלב <strong>3 פריטי שוק ספציפיים</strong> כדי ליצור פריטים נדירים שאי אפשר לקנות! ✅ ירוק = פריטים שיש לך. ❌ אדום = עדיין חסרים. פריטים מיוצרים גורמים נזק נוסף בקרב הבוס.' },
+    { icon: '🎨', color: '#BE185D', title: 'צור פריט',
+      text: 'קרב <strong>5 פריטים מיוצרים</strong> ליצירת פריט ייחודי משלך. העלה תמונה, תן שם ושם יוצר. הפריט המותאם שלך נשאר במלאי לנצח — ויש לו את <strong>עוצמת הבוס הגבוהה ביותר</strong>!' },
+    { icon: '⚔️', color: '#DC2626', title: 'קרב הבוס',
+      text: 'שלם דמי כניסה קטנים ונכנס לוורד הדרקון! בחר פריטים לתקוף — כל אחד מציג עוצמת בוס (⚔️ +X%). <strong>פריטים מיוצרים פוגעים יותר, מותאמים — הכי חזק.</strong> ניצחון = פרס מטבעות גדול! הבוס עולה רמה בכל ניצחון.' },
+    { icon: '🏆', color: '#B45309', title: 'לוח הדירוג',
+      text: 'ראה מי השחקן הכי עשיר בעיר הקסם! הדירוג מבוסס על נקודות שנצברו. גלגל יותר, קנה חכם, יצור הכל, ונצח את הבוס כדי לטפס ל<strong>מקום הראשון</strong>!' },
+    { icon: '💬', color: '#0891B2', title: "צ'אט",
+      text: 'חפש שחקנים אחרים לפי שם משתמש ושלח להם הודעות. הקש על שיחה בתיבת הדואר הנכנס כדי לפתוח אותה — הודעות מופיעות <strong>בזמן אמת</strong>. הישאר מחובר עם חבריך!' },
+  ],
+  es: [
+    { icon: '🏙️', color: '#7C3AED', title: '¡Bienvenido a Ciudad Mágica!',
+      text: 'Ciudad Mágica es una aventura de trivia para coleccionar monedas. ¡Responde preguntas, gana monedas, compra objetos mágicos, forja tesoros raros y desafía al temible Dragon Boss!' },
+    { icon: '🎲', color: '#D97706', title: 'Lanzar por Monedas',
+      text: 'Presiona <strong>🎲 Lanzar</strong> (cuesta 🪙5) para empezar. Aparece una pregunta de trivia — ¡responde <strong>correctamente</strong> para ganar muchas monedas! Si fallas, pierdes una pequeña cantidad. Hay un breve tiempo de espera entre lanzamientos.' },
+    { icon: '🛒', color: '#059669', title: 'El Mercado',
+      text: 'Gasta tus monedas en objetos mágicos de los mercaderes. <strong>¡Los precios cambian en cada visita!</strong> Antes de comprar, responde una pregunta de trivia — correcto = <strong>¡40% de descuento!</strong> Contrata más puestos para mayor variedad.' },
+    { icon: '🎒', color: '#2563EB', title: 'Tu Inventario',
+      text: 'Todos tus objetos están aquí — comprados, forjados y personalizados. Puedes <strong>poner a la venta cualquier objeto</strong> a otros jugadores al precio que elijas, o retirarlo cuando quieras.' },
+    { icon: '🔨', color: '#92400E', title: 'Taller de Forja',
+      text: 'Combina <strong>3 objetos específicos del mercado</strong> para forjar objetos raros que no puedes comprar en ningún lado. Insignias verdes ✅ = ingredientes que tienes. Rojas ❌ = aún los necesitas. Los forjados causan daño extra contra el Boss.' },
+    { icon: '🎨', color: '#BE185D', title: 'Crea tu Objeto',
+      text: 'Sacrifica <strong>5 objetos forjados</strong> para crear tu propia creación única. Sube una imagen, dale un nombre y título de creador. ¡Tu objeto personalizado vive en tu inventario para siempre — y tiene el <strong>mayor poder contra el Boss</strong>!' },
+    { icon: '⚔️', color: '#DC2626', title: 'Combate contra el Boss',
+      text: '¡Paga una pequeña tarifa y entra al Cubil del Dragón! Elige objetos para atacar — cada uno muestra su poder (⚔️ +X%). <strong>Los forjados golpean más duro, los personalizados son los más fuertes.</strong> ¡Ganar = gran recompensa! El Boss sube de nivel cada vez que lo derrotas.' },
+    { icon: '🏆', color: '#B45309', title: 'Clasificación',
+      text: '¡Ve quién es el jugador más rico de Ciudad Mágica! Los rankings se basan en los puntos ganados. Lanza más, compra con inteligencia, forja todo y vence al Boss para llegar al <strong>#1</strong>.' },
+    { icon: '💬', color: '#0891B2', title: 'Chat',
+      text: 'Busca a otros jugadores por nombre de usuario y envíales mensajes. Toca cualquier conversación en tu bandeja de entrada para abrirla — los mensajes aparecen <strong>en tiempo real</strong>. ¡Mantente conectado con tus compañeros entrenadores!' },
+  ],
+  fr: [
+    { icon: '🏙️', color: '#7C3AED', title: 'Bienvenue à Ville Magique !',
+      text: 'Ville Magique est une aventure de quiz pour collecter des pièces. Réponds à des questions de trivia pour gagner des pièces, achète des objets magiques, forge des trésors rares et défie le redoutable Dragon Boss !' },
+    { icon: '🎲', color: '#D97706', title: 'Lancer pour des Pièces',
+      text: 'Appuie sur <strong>🎲 Lancer</strong> (coûte 🪙5) pour commencer. Une question de quiz apparaît — réponds <strong>correctement</strong> pour gagner de nombreuses pièces ! En cas d\'erreur, tu perds une petite quantité. Il y a un court délai entre les lancers.' },
+    { icon: '🛒', color: '#059669', title: 'Le Marché',
+      text: 'Dépense tes pièces sur des objets magiques chez les marchands. <strong>Les prix changent à chaque visite</strong>, alors achète vite ! Avant d\'acheter, réponds à une question — correct = <strong>40 % de réduction !</strong> Engage des marchands supplémentaires pour plus de variété.' },
+    { icon: '🎒', color: '#2563EB', title: 'Ton Inventaire',
+      text: 'Tous tes objets se trouvent ici — achetés, forgés et personnalisés. Tu peux <strong>mettre en vente n\'importe quel objet</strong> à d\'autres joueurs au prix que tu veux, ou le retirer à tout moment.' },
+    { icon: '🔨', color: '#92400E', title: 'Atelier de Forge',
+      text: 'Combine <strong>3 objets spécifiques du marché</strong> pour forger des objets rares introuvables ailleurs ! Badges verts ✅ = ingrédients que tu possèdes. Rouges ❌ = encore nécessaires. Les forgés infligent des dégâts supplémentaires contre le Boss.' },
+    { icon: '🎨', color: '#BE185D', title: 'Crée ton Objet',
+      text: 'Sacrifie <strong>5 objets forgés</strong> pour créer ta propre création unique. Télécharge une image, donne-lui un nom et un titre de créateur. Ton objet personnalisé reste dans ton inventaire pour toujours — et possède le <strong>plus grand pouvoir contre le Boss</strong> !' },
+    { icon: '⚔️', color: '#DC2626', title: 'Combat contre le Boss',
+      text: 'Paie un petit droit d\'entrée et entre dans l\'Antre du Dragon ! Choisis des objets pour attaquer — chacun affiche son pouvoir (⚔️ +X%). <strong>Les forgés frappent plus fort, les personnalisés sont les plus puissants.</strong> Gagner = grande récompense en pièces ! Le Boss monte en niveau à chaque défaite.' },
+    { icon: '🏆', color: '#B45309', title: 'Classement',
+      text: 'Vois qui est le joueur le plus riche de Ville Magique ! Les classements sont basés sur les points gagnés. Lance plus souvent, achète intelligemment, forge tout et bats le Boss pour atteindre la <strong>1ère place</strong> !' },
+    { icon: '💬', color: '#0891B2', title: 'Chat',
+      text: 'Recherche d\'autres joueurs par nom d\'utilisateur et envoie-leur des messages. Appuie sur une conversation dans ta boîte de réception pour l\'ouvrir — les messages apparaissent <strong>en temps réel</strong>. Reste connecté avec tes compagnons dresseurs de dragons !' },
+  ],
+};
 
 let tutorialCurrentSlide = 0;
+let tutorialLang = 'en';
+
+function getTutorialSlides() {
+  return TUTORIAL_TRANSLATIONS[tutorialLang] || TUTORIAL_TRANSLATIONS.en;
+}
+
+function setTutorialLang(lang) {
+  if (!TUTORIAL_TRANSLATIONS[lang]) return;
+  tutorialLang = lang;
+  // RTL only inside the tutorial card for Hebrew
+  document.querySelector('.tutorial-card').dir = lang === 'he' ? 'rtl' : 'ltr';
+  // Highlight active lang button
+  document.querySelectorAll('.tutorial-lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tlang === lang);
+  });
+  renderTutorialSlide();
+}
 
 function openTutorial() {
   tutorialCurrentSlide = 0;
+  // Reset to EN each time tutorial opens (or keep last choice — currently resets)
+  tutorialLang = 'en';
+  document.querySelector('.tutorial-card').dir = 'ltr';
+  document.querySelectorAll('.tutorial-lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tlang === 'en');
+  });
   renderTutorialSlide();
   $('tutorial-modal').classList.remove('hidden');
 }
@@ -2065,8 +2114,9 @@ function closeTutorial() {
 }
 
 function renderTutorialSlide() {
-  const slide = TUTORIAL_SLIDES[tutorialCurrentSlide];
-  const total = TUTORIAL_SLIDES.length;
+  const slides = getTutorialSlides();
+  const slide  = slides[tutorialCurrentSlide];
+  const total  = slides.length;
 
   $('tutorial-slide-content').innerHTML = `
     <div class="tutorial-icon" style="color:${slide.color}">${slide.icon}</div>
@@ -2075,7 +2125,7 @@ function renderTutorialSlide() {
   `;
 
   // Render dots
-  $('tutorial-dots').innerHTML = TUTORIAL_SLIDES.map((_, i) =>
+  $('tutorial-dots').innerHTML = slides.map((_, i) =>
     `<span class="tutorial-dot ${i === tutorialCurrentSlide ? 'active' : ''}" data-i="${i}"></span>`
   ).join('');
   $('tutorial-dots').querySelectorAll('.tutorial-dot').forEach(dot => {
@@ -2394,7 +2444,10 @@ function attachListeners() {
   $('create-creator-name').addEventListener('input', updateCreateSubmitState);
   $('create-submit-btn').addEventListener('click', handleCreateSubmit);
 
-  // Tutorial
+  // Tutorial — lang switcher inside modal
+  document.querySelectorAll('.tutorial-lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => setTutorialLang(btn.dataset.tlang));
+  });
   $('tutorial-open-btn').addEventListener('click', openTutorial);
   $('tutorial-close-btn').addEventListener('click', closeTutorial);
   $('tutorial-modal').addEventListener('click', e => { if (e.target === $('tutorial-modal')) closeTutorial(); });

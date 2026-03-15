@@ -1725,6 +1725,28 @@ body {
   to   { transform: scale(1);    opacity: 1; }
 }
 
+/* Tutorial language picker (inside modal) */
+.tutorial-lang-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.tutorial-lang-btn {
+  background: #f3f4f6;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text);
+  transition: all 0.15s;
+}
+.tutorial-lang-btn:hover  { border-color: var(--purple); background: #ede9ff; color: var(--purple); }
+.tutorial-lang-btn.active { background: var(--purple); color: #fff; border-color: var(--purple); }
+
 .tutorial-close-btn {
   position: absolute;
   top: 14px;
