@@ -2013,22 +2013,21 @@ function goToChatScreen() {
   $('chat-username').textContent = currentUser.username;
   showScreen('chat');
   showChatInbox();
-  loadChatInbox();
-  // Poll inbox every 4 seconds so new incoming conversations appear automatically
-  clearInterval(chatInboxInterval);
-  chatInboxInterval = setInterval(loadChatInbox, 4000);
 }
 
 async function loadChatInbox() {
+  if (!currentUser) return;
   const { status, data } = await apiGet(`/chat/inbox?me=${currentUser.id}`);
-  const list  = $('chat-inbox-list');
-  const empty = $('chat-inbox-empty');
+  const list = $('chat-inbox-list');
+  if (!list) return;
 
-  if (status !== 200 || data.conversations.length === 0) {
-    empty.classList.remove('hidden');
+  // Don't refresh inbox while user is inside a conversation
+  if (chatWithUserId) return;
+
+  if (status !== 200 || !data.conversations || data.conversations.length === 0) {
+    list.innerHTML = '<p class="empty-state">No conversations yet — press Search to find a player! 👆</p>';
     return;
   }
-  empty.classList.add('hidden');
 
   list.innerHTML = data.conversations.map(c => `
     <div class="chat-inbox-item" data-uid="${c.partner_id}" data-uname="${c.partner_username}">
@@ -2054,9 +2053,9 @@ function showChatInbox() {
   $('chat-search-input').value = '';
   $('chat-search-results').innerHTML = '';
   loadChatInbox();
-  // Resume inbox polling
+  // Poll inbox every 2 seconds so new incoming messages appear quickly
   clearInterval(chatInboxInterval);
-  chatInboxInterval = setInterval(loadChatInbox, 4000);
+  chatInboxInterval = setInterval(loadChatInbox, 2000);
 }
 
 function showChatSearchPanel() {
@@ -2154,7 +2153,7 @@ async function handleChatSend() {
 
 function startChatPoll() {
   stopChatPoll();
-  chatPollInterval = setInterval(fetchConversation, 3000);
+  chatPollInterval = setInterval(fetchConversation, 2000);
 }
 
 function stopChatPoll() {
