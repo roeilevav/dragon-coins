@@ -467,9 +467,9 @@ body {
 
 .merchant-card:hover { border-color: var(--gold); transform: translateY(-3px); }
 
-.merchant-avatar { font-size: 3rem; line-height: 1; }
-.merchant-name   { font-weight: 800; font-size: 0.95rem; color: var(--purple); }
-.item-name       { font-weight: 700; font-size: 0.9rem; color: var(--text); }
+.merchant-avatar { font-size: 1.6rem; line-height: 1; }
+.merchant-name   { font-weight: 700; font-size: 0.72rem; color: var(--purple); }
+.item-name       { font-weight: 800; font-size: 1.2rem; color: var(--text); }
 .item-emoji      { font-size: 1.6rem; }
 .item-price      { font-weight: 800; color: var(--gold-dk); font-size: 1rem; }
 
