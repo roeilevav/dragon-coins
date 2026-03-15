@@ -553,6 +553,189 @@ const QUIZ_QUESTIONS = [
 ];
 
 // ============================================================
+//  TRANSLATIONS  (en / he / es / fr)
+// ============================================================
+const TRANSLATIONS = {
+  en: {
+    'login-title':      'Magic City',
+    'login-subtitle':   'Collect coins, visit merchants,<br>become the richest in the city!',
+    'login-label':      'Choose your username',
+    'login-hint':       'Up to 10 letters and numbers only',
+    'login-play-btn':   "Let's Play! 🐉",
+    'login-placeholder':'E.g. DragonKid',
+    'nav-roll':         '🎲 Roll',
+    'nav-market':       '🛍️ Market',
+    'nav-inventory':    '🎒 Inventory',
+    'nav-leaderboard':  '🏆 Leaderboard',
+    'nav-craft':        '🔨 Craft',
+    'nav-create':       '🎨 Create',
+    'nav-boss':         '⚔️ Boss Fight',
+    'nav-chat':         '💬 Chat',
+    'nav-logout':       '🚪 Logout',
+    'chat-roll-btn':    '🎲 Roll',
+    'roll-h2':          'Roll for Magic Coins!',
+    'roll-cost-hint':   'Each roll costs <strong>🪙 5</strong> — answer correctly to win coins!',
+    'roll-btn':         '🎲 Roll (🪙 5)',
+    'go-market-btn':    '🛒 Go to Market',
+    'market-h2':        '🛍️ Dragon Market',
+    'market-subtitle':  'Prices change every visit — shop fast!',
+    'inv-h2':           '🎒 Your Inventory',
+    'lb-h2':            '🏆 Top Dragon Trainers',
+    'craft-h2':         '🔨 Craft Shop',
+    'craft-subtitle':   "Combine items from the market to forge rare treasures you can't buy anywhere!",
+    'create-h2':        '🎨 Create Your Item',
+    'create-subtitle':  'Exchange <strong>5 crafted items</strong> to forge your own one-of-a-kind creation',
+  },
+  he: {
+    'login-title':      'עיר הקסם',
+    'login-subtitle':   'אסוף מטבעות, בקר סוחרים,<br>תהיה העשיר בעיר!',
+    'login-label':      'בחר שם משתמש',
+    'login-hint':       'עד 10 אותיות ומספרים בלבד',
+    'login-play-btn':   'בואו נשחק! 🐉',
+    'login-placeholder':'לדוגמה: DragonKid',
+    'nav-roll':         '🎲 גלגל',
+    'nav-market':       '🛍️ שוק',
+    'nav-inventory':    '🎒 מלאי',
+    'nav-leaderboard':  '🏆 דירוג',
+    'nav-craft':        '🔨 יצירה',
+    'nav-create':       '🎨 עיצוב',
+    'nav-boss':         '⚔️ בוס',
+    'nav-chat':         "💬 צ'אט",
+    'nav-logout':       '🚪 התנתק',
+    'chat-roll-btn':    '🎲 גלגל',
+    'roll-h2':          '!גלגל למטבעות קסם',
+    'roll-cost-hint':   'כל גלגול עולה <strong>🪙 5</strong> — ענה נכון כדי לזכות במטבעות!',
+    'roll-btn':         '🎲 גלגל (🪙 5)',
+    'go-market-btn':    '🛒 לשוק',
+    'market-h2':        '🛍️ שוק הדרקון',
+    'market-subtitle':  '!המחירים משתנים בכל ביקור — קנה מהר',
+    'inv-h2':           '🎒 המלאי שלך',
+    'lb-h2':            '🏆 מאלפי הדרקון המובילים',
+    'craft-h2':         '🔨 חנות יצירה',
+    'craft-subtitle':   '!שלב פריטים מהשוק לזייף פריטים נדירים',
+    'create-h2':        '🎨 צור פריט',
+    'create-subtitle':  'החלף <strong>5 פריטים מיוצרים</strong> ליצירה ייחודית משלך',
+  },
+  es: {
+    'login-title':      'Ciudad Mágica',
+    'login-subtitle':   'Colecciona monedas, visita mercaderes,<br>¡sé el más rico de la ciudad!',
+    'login-label':      'Elige tu nombre de usuario',
+    'login-hint':       'Solo letras y números (máx. 10)',
+    'login-play-btn':   '¡Juguemos! 🐉',
+    'login-placeholder':'Ej. DragonKid',
+    'nav-roll':         '🎲 Lanzar',
+    'nav-market':       '🛍️ Mercado',
+    'nav-inventory':    '🎒 Inventario',
+    'nav-leaderboard':  '🏆 Ranking',
+    'nav-craft':        '🔨 Forjar',
+    'nav-create':       '🎨 Crear',
+    'nav-boss':         '⚔️ Jefe Final',
+    'nav-chat':         '💬 Chat',
+    'nav-logout':       '🚪 Salir',
+    'chat-roll-btn':    '🎲 Lanzar',
+    'roll-h2':          '¡Lanza por Monedas Mágicas!',
+    'roll-cost-hint':   'Cada lanzamiento cuesta <strong>🪙 5</strong> — ¡responde para ganar!',
+    'roll-btn':         '🎲 Lanzar (🪙 5)',
+    'go-market-btn':    '🛒 Ir al Mercado',
+    'market-h2':        '🛍️ Mercado del Dragón',
+    'market-subtitle':  '¡Los precios cambian en cada visita — compra rápido!',
+    'inv-h2':           '🎒 Tu Inventario',
+    'lb-h2':            '🏆 Mejores Entrenadores',
+    'craft-h2':         '🔨 Taller de Forja',
+    'craft-subtitle':   '¡Combina objetos del mercado para forjar tesoros raros que no puedes comprar!',
+    'create-h2':        '🎨 Crea tu Objeto',
+    'create-subtitle':  'Intercambia <strong>5 objetos forjados</strong> para crear tu propia creación única',
+  },
+  fr: {
+    'login-title':      'Ville Magique',
+    'login-subtitle':   'Collecte des pièces, visite des marchands,<br>deviens le plus riche de la ville !',
+    'login-label':      "Choisis ton nom d'utilisateur",
+    'login-hint':       'Lettres et chiffres uniquement (10 max)',
+    'login-play-btn':   'On joue ! 🐉',
+    'login-placeholder':'Ex. DragonKid',
+    'nav-roll':         '🎲 Lancer',
+    'nav-market':       '🛍️ Marché',
+    'nav-inventory':    '🎒 Inventaire',
+    'nav-leaderboard':  '🏆 Classement',
+    'nav-craft':        '🔨 Forger',
+    'nav-create':       '🎨 Créer',
+    'nav-boss':         '⚔️ Boss Final',
+    'nav-chat':         '💬 Chat',
+    'nav-logout':       '🚪 Déconnexion',
+    'chat-roll-btn':    '🎲 Lancer',
+    'roll-h2':          'Lance pour des Pièces Magiques !',
+    'roll-cost-hint':   'Chaque lancer coûte <strong>🪙 5</strong> — réponds correctement pour gagner !',
+    'roll-btn':         '🎲 Lancer (🪙 5)',
+    'go-market-btn':    '🛒 Aller au Marché',
+    'market-h2':        '🛍️ Marché du Dragon',
+    'market-subtitle':  'Les prix changent à chaque visite — achetez vite !',
+    'inv-h2':           '🎒 Ton Inventaire',
+    'lb-h2':            '🏆 Meilleurs Dresseurs',
+    'craft-h2':         '🔨 Atelier de Forge',
+    'craft-subtitle':   "Combine des objets du marché pour forger des trésors rares qu'on ne peut pas acheter !",
+    'create-h2':        '🎨 Crée ton Objet',
+    'create-subtitle':  'Échange <strong>5 objets forgés</strong> pour créer ta propre création unique',
+  },
+};
+
+// Nav link IDs grouped by navigation type (for bulk translation updates)
+const NAV_GROUPS = {
+  'nav-roll':        ['nav-roll-from-market','nav-roll-from-inv','nav-roll-from-lb','nav-roll-from-craft','nav-roll-from-create','nav-roll-from-boss'],
+  'nav-market':      ['nav-market-from-inv','nav-market-from-lb','nav-market-from-craft','nav-market-from-create','nav-market-from-boss'],
+  'nav-inventory':   ['nav-inventory','nav-inventory-from-lb','nav-inventory-from-craft','nav-inventory-from-create','nav-inventory-from-boss'],
+  'nav-leaderboard': ['nav-leaderboard','nav-leaderboard-from-inv','nav-leaderboard-from-craft','nav-leaderboard-from-create','nav-leaderboard-from-boss'],
+  'nav-craft':       ['nav-craft-from-roll','nav-craft-from-market','nav-craft-from-inv','nav-craft-from-lb','nav-craft-from-create','nav-craft-from-boss'],
+  'nav-create':      ['nav-create-from-roll','nav-create-from-market','nav-create-from-inv','nav-create-from-lb','nav-create-from-craft','nav-create-from-boss'],
+  'nav-boss':        ['nav-boss-from-roll','nav-boss-from-market','nav-boss-from-inv','nav-boss-from-lb','nav-boss-from-craft','nav-boss-from-create'],
+  'nav-chat':        ['nav-chat-from-roll','nav-chat-from-market','nav-chat-from-inv','nav-chat-from-lb','nav-chat-from-craft','nav-chat-from-create','nav-chat-from-boss'],
+};
+
+let currentLang = 'en';
+
+function setLanguage(lang) {
+  if (!TRANSLATIONS[lang]) return;
+  currentLang = lang;
+  localStorage.setItem('gameLang', lang);
+
+  // RTL support for Hebrew
+  document.documentElement.dir  = lang === 'he' ? 'rtl' : 'ltr';
+  document.documentElement.lang = lang;
+
+  const t = TRANSLATIONS[lang];
+
+  // Update static elements by their HTML id (id === translation key)
+  ['login-title','login-subtitle','login-label','login-hint','login-play-btn',
+   'roll-h2','roll-cost-hint','roll-btn','go-market-btn',
+   'market-h2','market-subtitle','inv-h2','lb-h2',
+   'craft-h2','craft-subtitle','create-h2','create-subtitle',
+   'chat-roll-btn',
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && t[id]) el.innerHTML = t[id];
+  });
+
+  // Update username input placeholder
+  const inp = document.getElementById('username-input');
+  if (inp && t['login-placeholder']) inp.placeholder = t['login-placeholder'];
+
+  // Update all nav links by group
+  Object.entries(NAV_GROUPS).forEach(([key, ids]) => {
+    if (!t[key]) return;
+    ids.forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = t[key]; });
+  });
+
+  // Update all logout buttons
+  if (t['nav-logout']) {
+    document.querySelectorAll('.btn-logout').forEach(el => { el.innerHTML = t['nav-logout']; });
+  }
+
+  // Highlight the active lang button
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+}
+
+// ============================================================
 //  STATE
 // ============================================================
 let currentUser    = null;
@@ -2288,6 +2471,12 @@ function attachListeners() {
 // ============================================================
 async function boot() {
   attachListeners();
+
+  // Language picker — wire buttons and apply saved language
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+  });
+  setLanguage(localStorage.getItem('gameLang') || 'en');
 
   const savedUsername = sessionStorage.getItem('dragonUsername');
   if (savedUsername) {

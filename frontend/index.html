@@ -13,11 +13,17 @@
   <!-- ========== LOGIN SCREEN ========== -->
   <div id="screen-login" class="screen active">
     <div class="login-card">
+      <div class="lang-picker">
+        <button class="lang-btn active" data-lang="en">🇺🇸 EN</button>
+        <button class="lang-btn" data-lang="he">🇮🇱 HE</button>
+        <button class="lang-btn" data-lang="es">🇪🇸 ES</button>
+        <button class="lang-btn" data-lang="fr">🇫🇷 FR</button>
+      </div>
       <div class="dragon-logo">🐉</div>
-      <h1>Magic City</h1>
-      <p class="subtitle">Collect coins, visit merchants,<br>become the richest in the city!</p>
+      <h1 id="login-title">Magic City</h1>
+      <p class="subtitle" id="login-subtitle">Collect coins, visit merchants,<br>become the richest in the city!</p>
       <form id="login-form">
-        <label for="username-input">Choose your username</label>
+        <label for="username-input" id="login-label">Choose your username</label>
         <input
           id="username-input"
           type="text"
@@ -26,9 +32,9 @@
           autocomplete="off"
           spellcheck="false"
         />
-        <p class="input-hint">Up to 10 letters and numbers only</p>
+        <p class="input-hint" id="login-hint">Up to 10 letters and numbers only</p>
         <div id="login-error" class="error-msg hidden"></div>
-        <button type="submit" class="btn btn-primary btn-large">
+        <button type="submit" class="btn btn-primary btn-large" id="login-play-btn">
           Let's Play! 🐉
         </button>
       </form>
@@ -52,9 +58,9 @@
     </header>
 
     <main class="roll-main">
-      <h2>Roll for Magic Coins!</h2>
+      <h2 id="roll-h2">Roll for Magic Coins!</h2>
 
-      <p class="roll-cost-hint">Each roll costs <strong>🪙 5</strong> — answer correctly to win coins!</p>
+      <p class="roll-cost-hint" id="roll-cost-hint">Each roll costs <strong>🪙 5</strong> — answer correctly to win coins!</p>
 
       <div id="roll-result" class="roll-result hidden"></div>
 
@@ -100,8 +106,8 @@
     </header>
 
     <main class="market-main">
-      <h2>🛍️ Dragon Market</h2>
-      <p class="market-subtitle">Prices change every visit — shop fast!</p>
+      <h2 id="market-h2">🛍️ Dragon Market</h2>
+      <p class="market-subtitle" id="market-subtitle">Prices change every visit — shop fast!</p>
 
       <div class="hire-merchant-wrap">
         <button id="hire-merchant-btn" class="btn btn-gold hire-merchant-btn">
@@ -139,7 +145,7 @@
     </header>
 
     <main class="inventory-main">
-      <h2>🎒 Your Inventory</h2>
+      <h2 id="inv-h2">🎒 Your Inventory</h2>
       <div id="inventory-grid" class="inventory-grid"></div>
     </main>
   </div>
@@ -164,7 +170,7 @@
     </header>
 
     <main class="leaderboard-main">
-      <h2>🏆 Top Dragon Trainers</h2>
+      <h2 id="lb-h2">🏆 Top Dragon Trainers</h2>
       <div id="leaderboard-table" class="leaderboard-table"></div>
     </main>
   </div>
@@ -189,8 +195,8 @@
     </header>
 
     <main class="craft-main">
-      <h2>🔨 Craft Shop</h2>
-      <p class="craft-subtitle">Combine items from the market to forge rare treasures you can't buy anywhere!</p>
+      <h2 id="craft-h2">🔨 Craft Shop</h2>
+      <p class="craft-subtitle" id="craft-subtitle">Combine items from the market to forge rare treasures you can't buy anywhere!</p>
       <div id="craft-grid" class="craft-grid"></div>
     </main>
   </div>
@@ -215,8 +221,8 @@
     </header>
 
     <main class="create-main">
-      <h2>🎨 Create Your Item</h2>
-      <p class="create-subtitle">Exchange <strong>5 crafted items</strong> to forge your own one-of-a-kind creation</p>
+      <h2 id="create-h2">🎨 Create Your Item</h2>
+      <p class="create-subtitle" id="create-subtitle">Exchange <strong>5 crafted items</strong> to forge your own one-of-a-kind creation</p>
 
       <!-- Not enough crafted items -->
       <div id="create-locked" class="create-locked hidden">
