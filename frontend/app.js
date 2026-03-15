@@ -711,7 +711,10 @@ async function handleRollQuizAnswer(e) {
     // Show result message
     const resultEl = $('roll-quiz-result');
     if (data.correct) {
-      resultEl.innerHTML = `<span class="roll-quiz-correct">🎉 Correct! You earned <strong>🪙 ${data.earned}</strong> Dragon Coins!</span>`;
+      const bonusStr = data.customBonus > 0
+        ? ` <span class="roll-custom-bonus">✨ +${data.customBonus}% custom bonus!</span>`
+        : '';
+      resultEl.innerHTML = `<span class="roll-quiz-correct">🎉 Correct! You earned <strong>🪙 ${data.earned}</strong> Dragon Coins!${bonusStr}</span>`;
     } else {
       resultEl.innerHTML = `<span class="roll-quiz-wrong">❌ Wrong! You lost <strong>🪙 ${data.lost}</strong> coins. Better luck next time!</span>`;
     }
@@ -1587,6 +1590,7 @@ function getBossScaledDmgRange(level) {
 }
 
 let bossBattleItems  = [];
+let bossCustomCount  = 0; // # of custom items in battle — each gives +3% custom damage
 let bossCurrentHp    = BOSS_BASE_HP;
 let bossTotalHp      = BOSS_BASE_HP;
 let playerCurrentHp  = PLAYER_MAX_HP;
@@ -1609,7 +1613,12 @@ function getBossDamageRange(item) {
 
 function bossDamageRoll(item) {
   const [min, max] = getBossDamageRange(item);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  const raw = Math.floor(Math.random() * (max - min + 1)) + min;
+  // Custom items get +3% damage per custom item owned in battle
+  if (item.is_custom && bossCustomCount > 0) {
+    return Math.round(raw * (1 + bossCustomCount * 0.03));
+  }
+  return raw;
 }
 
 function bossCounterRoll(level) {
@@ -1619,7 +1628,16 @@ function bossCounterRoll(level) {
 
 function bossPowerLabel(item) {
   const [min, max] = getBossDamageRange(item);
-  if (item.is_custom)  return `★★★★ Custom · ${min}–${max}⚔️`;
+  if (item.is_custom) {
+    if (bossCustomCount > 0) {
+      const boost = 1 + bossCustomCount * 0.03;
+      const bMin  = Math.round(min * boost);
+      const bMax  = Math.round(max * boost);
+      const pct   = Math.round(bossCustomCount * 3);
+      return `★★★★ Custom · ${bMin}–${bMax}⚔️ ⚡+${pct}%`;
+    }
+    return `★★★★ Custom · ${min}–${max}⚔️`;
+  }
   if (item.is_crafted) return `★★★ Crafted · ${min}–${max}⚔️`;
   const name = (item.item_name || '').toLowerCase();
   const weaponWords = ['sword','axe','ninja','shield','freeze','cannon','battle','magic','wand',
@@ -1673,6 +1691,7 @@ async function goToBossScreen() {
 
     currentBossLevel = getBossLevel();
     bossBattleItems  = usable;
+    bossCustomCount  = usable.filter(i => i.is_custom).length;
     bossCurrentHp    = getBossScaledHp(currentBossLevel);
     bossTotalHp      = bossCurrentHp;
     playerCurrentHp  = PLAYER_MAX_HP;

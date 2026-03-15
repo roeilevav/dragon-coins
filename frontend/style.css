@@ -399,6 +399,14 @@ body {
   color: var(--red);
 }
 
+.roll-custom-bonus {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #b47cff;
+}
+
 /* ===========================
    MARKET SCREEN
    =========================== */

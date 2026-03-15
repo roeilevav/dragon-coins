@@ -224,13 +224,19 @@ router.post('/:id/roll/start', (req, res) => {
   seen.push(qi);
   db.prepare("UPDATE users SET seen_questions = ? WHERE id = ?").run(JSON.stringify(seen), userId);
 
-  const earned = Math.floor(Math.random() * 41) + 40; // 40–80
+  // Count unlisted custom items → each gives +3% bonus to earned coins
+  const customCount = db.prepare(
+    "SELECT COUNT(*) as n FROM inventory WHERE user_id = ? AND is_custom = 1 AND listed_price IS NULL"
+  ).get(userId).n || 0;
+  const earnedBase = Math.floor(Math.random() * 41) + 40; // 40–80
+  const earned = Math.round(earnedBase * (1 + customCount * 0.03));
 
   // Generate token
   const token = crypto.randomBytes(16).toString('hex');
   pendingRolls.set(token, {
     userId,
     earned,
+    customCount,
     correctIndex: q.correct,
     expiresAt: now + 2 * 60 * 1000, // 2 min to answer
   });
@@ -280,6 +286,7 @@ router.post('/:id/roll/answer', (req, res) => {
     correct: isCorrect,
     correctIndex: pending.correctIndex,
     earned: isCorrect ? pending.earned : 0,
+    customBonus: pending.customCount > 0 ? Math.round(pending.customCount * 3) : 0,
     lost: ROLL_COST,
     user: updated,
   });
