@@ -136,6 +136,19 @@ async function initDb() {
   // Migration: leaderboard points (earned coins + boss wins + crafts + customs)
   try { _sqlDb.exec('ALTER TABLE users ADD COLUMN points INTEGER NOT NULL DEFAULT 0'); } catch (e) {}
 
+  // Chat messages between players
+  _sqlDb.exec(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id           INTEGER PRIMARY KEY AUTOINCREMENT,
+      sender_id    INTEGER NOT NULL,
+      recipient_id INTEGER NOT NULL,
+      message      TEXT    NOT NULL,
+      created_at   TEXT    NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (sender_id)    REFERENCES users(id),
+      FOREIGN KEY (recipient_id) REFERENCES users(id)
+    );
+  `);
+
   // Missions: track which missions each user has completed
   _sqlDb.exec(`
     CREATE TABLE IF NOT EXISTS completed_missions (

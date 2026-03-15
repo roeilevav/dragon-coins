@@ -11,6 +11,7 @@ async function start() {
   const listingsRouter   = require('./routes/listings');
   const craftRouter      = require('./routes/craft');
   const customRouter     = require('./routes/custom');
+  const chatRouter       = require('./routes/chat');
 
   const app = express();
   const PORT = process.env.PORT || 3000;
@@ -26,6 +27,7 @@ async function start() {
   app.use('/listings', listingsRouter);
   app.use('/craft', craftRouter);
   app.use('/custom', customRouter);
+  app.use('/chat', chatRouter);
 
   // Global error handler
   app.use((err, req, res, next) => {

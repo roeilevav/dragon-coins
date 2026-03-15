@@ -481,6 +481,7 @@ let inventoryCountMap = {}; // { itemName: count } — refreshed each market vis
 function $(id) { return document.getElementById(id); }
 
 function showScreen(name) {
+  if (name !== 'chat') stopChatPoll(); // stop polling when leaving chat
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $(`screen-${name}`).classList.add('active');
 }
@@ -1909,6 +1910,147 @@ function handleLogout() {
   showScreen('login');
 }
 
+// ============================================================
+//  CHAT SCREEN
+// ============================================================
+let chatPollInterval  = null;
+let chatWithUserId    = null;
+let chatWithUsername  = '';
+
+function goToChatScreen() {
+  updateBalances();
+  $('chat-username').textContent = currentUser.username;
+  showScreen('chat');
+  showChatInbox();
+  loadChatInbox();
+}
+
+async function loadChatInbox() {
+  const { status, data } = await apiGet(`/chat/inbox?me=${currentUser.id}`);
+  const list  = $('chat-inbox-list');
+  const empty = $('chat-inbox-empty');
+
+  if (status !== 200 || data.conversations.length === 0) {
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  list.innerHTML = data.conversations.map(c => `
+    <div class="chat-inbox-item" data-uid="${c.partner_id}" data-uname="${c.partner_username}">
+      <span class="chat-inbox-name">👤 ${c.partner_username}</span>
+      <span class="chat-inbox-preview">${c.last_message.length > 40 ? c.last_message.slice(0, 40) + '…' : c.last_message}</span>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.chat-inbox-item').forEach(el => {
+    el.addEventListener('click', () => {
+      openConversation(parseInt(el.dataset.uid), el.dataset.uname);
+    });
+  });
+}
+
+function showChatInbox() {
+  stopChatPoll();
+  chatWithUserId   = null;
+  chatWithUsername = '';
+  $('chat-panel').classList.remove('hidden');
+  $('chat-conv-panel').classList.add('hidden');
+  $('chat-search-input').value = '';
+  $('chat-search-results').classList.add('hidden');
+  $('chat-search-results').innerHTML = '';
+}
+
+async function handleChatSearch() {
+  const q   = $('chat-search-input').value.trim();
+  const res = $('chat-search-results');
+  if (!q) { res.classList.add('hidden'); return; }
+
+  const { status, data } = await apiGet(`/chat/search?q=${encodeURIComponent(q)}&me=${currentUser.id}`);
+  res.classList.remove('hidden');
+
+  if (status !== 200 || data.users.length === 0) {
+    res.innerHTML = `<p class="chat-no-results">No players found for "${q}"</p>`;
+    return;
+  }
+
+  res.innerHTML = data.users.map(u => `
+    <div class="chat-search-item" data-uid="${u.id}" data-uname="${u.username}">
+      👤 ${u.username}
+    </div>
+  `).join('');
+
+  res.querySelectorAll('.chat-search-item').forEach(el => {
+    el.addEventListener('click', () => {
+      openConversation(parseInt(el.dataset.uid), el.dataset.uname);
+    });
+  });
+}
+
+function openConversation(userId, username) {
+  chatWithUserId   = userId;
+  chatWithUsername = username;
+  $('chat-panel').classList.add('hidden');
+  $('chat-conv-panel').classList.remove('hidden');
+  $('chat-conv-title').textContent = `💬 ${username}`;
+  $('chat-msg-input').value = '';
+  $('chat-messages-list').innerHTML = '<p class="empty-state">Loading… ⏳</p>';
+  fetchConversation();
+  startChatPoll();
+}
+
+async function fetchConversation() {
+  const { status, data } = await apiGet(`/chat/conversation?me=${currentUser.id}&with=${chatWithUserId}`);
+  if (status !== 200) return;
+
+  const list = $('chat-messages-list');
+  if (data.messages.length === 0) {
+    list.innerHTML = `<p class="chat-empty-conv">No messages yet — say hi! 👋</p>`;
+    return;
+  }
+
+  list.innerHTML = data.messages.map(m => {
+    const isMe = m.sender_id === currentUser.id;
+    const time  = new Date(m.created_at + 'Z').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return `
+      <div class="chat-msg ${isMe ? 'chat-msg-me' : 'chat-msg-them'}">
+        <div class="chat-bubble">${escapeHtml(m.message)}</div>
+        <div class="chat-time">${time}</div>
+      </div>
+    `;
+  }).join('');
+
+  // Scroll to bottom
+  list.scrollTop = list.scrollHeight;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function handleChatSend() {
+  const input = $('chat-msg-input');
+  const msg   = input.value.trim();
+  if (!msg || !chatWithUserId) return;
+
+  input.value = '';
+  await apiPost('/chat/send', {
+    sender_id:    currentUser.id,
+    recipient_id: chatWithUserId,
+    message:      msg,
+  });
+  fetchConversation();
+}
+
+function startChatPoll() {
+  stopChatPoll();
+  chatPollInterval = setInterval(fetchConversation, 3000);
+}
+
+function stopChatPoll() {
+  if (chatPollInterval) { clearInterval(chatPollInterval); chatPollInterval = null; }
+}
+
 function attachListeners() {
   $('login-form').addEventListener('submit', handleLogin);
   $('roll-btn').addEventListener('click', handleRoll);
@@ -1992,6 +2134,31 @@ function attachListeners() {
   $('nav-leaderboard-from-boss').addEventListener('click',e => { e.preventDefault(); goToLeaderboardScreen(); });
   $('nav-craft-from-boss').addEventListener('click',      e => { e.preventDefault(); goToCraftScreen(); });
   $('nav-create-from-boss').addEventListener('click',     e => { e.preventDefault(); goToCreateScreen(); });
+  $('nav-chat-from-boss').addEventListener('click',       e => { e.preventDefault(); goToChatScreen(); });
+
+  // Chat nav from all screens
+  $('nav-chat-from-roll').addEventListener('click',       e => { e.preventDefault(); goToChatScreen(); });
+  $('nav-chat-from-market').addEventListener('click',     e => { e.preventDefault(); goToChatScreen(); });
+  $('nav-chat-from-inv').addEventListener('click',        e => { e.preventDefault(); goToChatScreen(); });
+  $('nav-chat-from-lb').addEventListener('click',         e => { e.preventDefault(); goToChatScreen(); });
+  $('nav-chat-from-craft').addEventListener('click',      e => { e.preventDefault(); goToChatScreen(); });
+  $('nav-chat-from-create').addEventListener('click',     e => { e.preventDefault(); goToChatScreen(); });
+
+  // Chat screen nav back to other screens
+  $('nav-roll-from-chat').addEventListener('click',       e => { e.preventDefault(); goToRollScreen(); });
+  $('nav-market-from-chat').addEventListener('click',     e => { e.preventDefault(); goToMarketScreen(); });
+  $('nav-inventory-from-chat').addEventListener('click',  e => { e.preventDefault(); goToInventoryScreen(); });
+  $('nav-leaderboard-from-chat').addEventListener('click',e => { e.preventDefault(); goToLeaderboardScreen(); });
+  $('nav-craft-from-chat').addEventListener('click',      e => { e.preventDefault(); goToCraftScreen(); });
+  $('nav-create-from-chat').addEventListener('click',     e => { e.preventDefault(); goToCreateScreen(); });
+  $('nav-boss-from-chat').addEventListener('click',       e => { e.preventDefault(); goToBossScreen(); });
+
+  // Chat controls
+  $('chat-search-btn').addEventListener('click', handleChatSearch);
+  $('chat-search-input').addEventListener('keydown', e => { if (e.key === 'Enter') handleChatSearch(); });
+  $('chat-send-btn').addEventListener('click', handleChatSend);
+  $('chat-msg-input').addEventListener('keydown', e => { if (e.key === 'Enter') handleChatSend(); });
+  $('chat-back-btn').addEventListener('click', showChatInbox);
 
   // Boss Fight — combat and controls
   $('boss-items-grid').addEventListener('click', handleBossItemClick);

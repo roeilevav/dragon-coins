@@ -46,6 +46,7 @@
         <a href="#" id="nav-craft-from-roll">🔨 Craft</a>
         <a href="#" id="nav-create-from-roll">🎨 Create</a>
         <a href="#" id="nav-boss-from-roll" class="nav-boss-link">⚔️ Boss Fight</a>
+        <a href="#" id="nav-chat-from-roll" class="nav-chat-link">💬 Chat</a>
       </nav>
       <button class="btn btn-logout logout-btn">🚪 Logout</button>
     </header>
@@ -93,6 +94,7 @@
         <a href="#" id="nav-craft-from-market">🔨 Craft</a>
         <a href="#" id="nav-create-from-market">🎨 Create</a>
         <a href="#" id="nav-boss-from-market" class="nav-boss-link">⚔️ Boss</a>
+        <a href="#" id="nav-chat-from-market" class="nav-chat-link">💬 Chat</a>
       </nav>
       <button class="btn btn-logout logout-btn">🚪 Logout</button>
     </header>
@@ -131,6 +133,7 @@
         <a href="#" id="nav-craft-from-inv">🔨 Craft</a>
         <a href="#" id="nav-create-from-inv">🎨 Create</a>
         <a href="#" id="nav-boss-from-inv" class="nav-boss-link">⚔️ Boss</a>
+        <a href="#" id="nav-chat-from-inv" class="nav-chat-link">💬 Chat</a>
       </nav>
       <button class="btn btn-logout logout-btn">🚪 Logout</button>
     </header>
@@ -155,6 +158,7 @@
         <a href="#" id="nav-craft-from-lb">🔨 Craft</a>
         <a href="#" id="nav-create-from-lb">🎨 Create</a>
         <a href="#" id="nav-boss-from-lb" class="nav-boss-link">⚔️ Boss</a>
+        <a href="#" id="nav-chat-from-lb" class="nav-chat-link">💬 Chat</a>
       </nav>
       <button class="btn btn-logout logout-btn">🚪 Logout</button>
     </header>
@@ -179,6 +183,7 @@
         <a href="#" id="nav-leaderboard-from-craft">🏆 Leaderboard</a>
         <a href="#" id="nav-create-from-craft">🎨 Create</a>
         <a href="#" id="nav-boss-from-craft" class="nav-boss-link">⚔️ Boss</a>
+        <a href="#" id="nav-chat-from-craft" class="nav-chat-link">💬 Chat</a>
       </nav>
       <button class="btn btn-logout logout-btn">🚪 Logout</button>
     </header>
@@ -204,6 +209,7 @@
         <a href="#" id="nav-leaderboard-from-create">🏆 Leaderboard</a>
         <a href="#" id="nav-craft-from-create">🔨 Craft</a>
         <a href="#" id="nav-boss-from-create" class="nav-boss-link">⚔️ Boss</a>
+        <a href="#" id="nav-chat-from-create" class="nav-chat-link">💬 Chat</a>
       </nav>
       <button class="btn btn-logout logout-btn">🚪 Logout</button>
     </header>
@@ -284,6 +290,7 @@
         <a href="#" id="nav-leaderboard-from-boss">🏆 Leaderboard</a>
         <a href="#" id="nav-craft-from-boss">🔨 Craft</a>
         <a href="#" id="nav-create-from-boss">🎨 Create</a>
+        <a href="#" id="nav-chat-from-boss" class="nav-chat-link">💬 Chat</a>
       </nav>
       <button class="btn btn-logout logout-btn">🚪 Logout</button>
     </header>
@@ -363,6 +370,62 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- ========== CHAT SCREEN ========== -->
+  <div id="screen-chat" class="screen hidden">
+    <header class="top-bar">
+      <div class="user-info">
+        <span id="chat-username" class="username-tag"></span>
+        <span class="balance" id="chat-balance">🪙 0</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#" id="nav-roll-from-chat">🎲 Roll</a>
+        <a href="#" id="nav-market-from-chat">🛍️ Market</a>
+        <a href="#" id="nav-inventory-from-chat">🎒 Inventory</a>
+        <a href="#" id="nav-leaderboard-from-chat">🏆 Leaderboard</a>
+        <a href="#" id="nav-craft-from-chat">🔨 Craft</a>
+        <a href="#" id="nav-create-from-chat">🎨 Create</a>
+        <a href="#" id="nav-boss-from-chat" class="nav-boss-link">⚔️ Boss</a>
+      </nav>
+      <button class="btn btn-logout logout-btn">🚪 Logout</button>
+    </header>
+
+    <main class="chat-main">
+
+      <!-- Inbox + Search panel -->
+      <div id="chat-panel">
+        <h2 class="chat-title">💬 Chat</h2>
+
+        <div class="chat-search-row">
+          <input id="chat-search-input" class="chat-search-input" type="text" placeholder="Search player by name…" />
+          <button id="chat-search-btn" class="btn btn-purple">🔍 Search</button>
+        </div>
+
+        <div id="chat-search-results" class="chat-search-results hidden"></div>
+
+        <div id="chat-inbox-section">
+          <p class="chat-section-label">Recent conversations</p>
+          <div id="chat-inbox-list" class="chat-inbox-list">
+            <p class="empty-state" id="chat-inbox-empty">No conversations yet — search for a player to start! 👆</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conversation view -->
+      <div id="chat-conv-panel" class="hidden">
+        <div class="chat-conv-header">
+          <button id="chat-back-btn" class="btn btn-purple chat-back-btn">← Back</button>
+          <span id="chat-conv-title" class="chat-conv-title"></span>
+        </div>
+        <div id="chat-messages-list" class="chat-messages-list"></div>
+        <div class="chat-send-row">
+          <input id="chat-msg-input" class="chat-msg-input" type="text" placeholder="Type a message…" maxlength="500" />
+          <button id="chat-send-btn" class="btn btn-green">Send ➤</button>
+        </div>
+      </div>
+
+    </main>
   </div>
 
   <!-- Buy success toast -->
