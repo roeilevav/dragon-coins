@@ -817,7 +817,11 @@ async function confirmQuizPurchase() {
     updateBalances();
     showToast(`Bought ${itemName}! 🎉`);
     closeQuizModal();
-    setTimeout(() => { renderMarket(); renderPlayerListings(); }, 300);
+    setTimeout(() => {
+      renderMarket();
+      for (let i = 0; i < extraMerchantsHired; i++) addExtraMerchantToGrid();
+      renderPlayerListings();
+    }, 300);
 
   } catch (err) {
     showToast('Could not reach server!', true);
