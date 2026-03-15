@@ -350,22 +350,45 @@ router.post('/:id/inventory/:itemId/unlist', (req, res) => {
   return res.json({ success: true });
 });
 
-// ---- Extra Merchant ----
-const HIRE_MERCHANT_COST = 300;
+// ---- Extra Merchant (dynamic cost sent from client) ----
 
-// POST /users/:id/hire-merchant — pay 300 coins to unlock an extra merchant slot
+// POST /users/:id/hire-merchant — deduct the cost for a new merchant slot
 router.post('/:id/hire-merchant', (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  const { cost } = req.body;
+
+  if (typeof cost !== 'number' || !Number.isInteger(cost) || cost < 1 || cost > 100000) {
+    return res.status(400).json({ error: 'Invalid cost value.' });
+  }
+
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+  if (!user) return res.status(404).json({ error: 'User not found.' });
+
+  if (user.coins < cost) {
+    return res.status(402).json({ error: `Need ${cost} coins to unlock this merchant slot.` });
+  }
+
+  db.prepare('UPDATE users SET coins = coins - ? WHERE id = ?').run(cost, userId);
+  const updated = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+  return res.json({ user: updated, cost });
+});
+
+// ---- Boss Entry Fee ----
+const BOSS_ENTRY_FEE = 20;
+
+// POST /users/:id/boss-entry — deduct 20 coins entry fee to challenge the boss
+router.post('/:id/boss-entry', (req, res) => {
   const userId = parseInt(req.params.id, 10);
   const user   = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
   if (!user) return res.status(404).json({ error: 'User not found.' });
 
-  if (user.coins < HIRE_MERCHANT_COST) {
-    return res.status(402).json({ error: `Need ${HIRE_MERCHANT_COST} coins to hire the extra merchant.` });
+  if (user.coins < BOSS_ENTRY_FEE) {
+    return res.status(402).json({ error: `Need ${BOSS_ENTRY_FEE} coins to enter the Boss Arena.` });
   }
 
-  db.prepare('UPDATE users SET coins = coins - ? WHERE id = ?').run(HIRE_MERCHANT_COST, userId);
+  db.prepare('UPDATE users SET coins = coins - ? WHERE id = ?').run(BOSS_ENTRY_FEE, userId);
   const updated = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
-  return res.json({ user: updated, cost: HIRE_MERCHANT_COST });
+  return res.json({ user: updated });
 });
 
 // ---- Boss Fight rewards ----

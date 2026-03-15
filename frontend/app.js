@@ -836,21 +836,23 @@ function closeQuizModal() {
 // ============================================================
 function goToMarketScreen() {
   updateBalances();
-  // Reset extra merchant state each visit
-  extraMerchantHired = false;
-  const hireBtn = $('hire-merchant-btn');
-  if (hireBtn) { hireBtn.classList.remove('hidden'); hireBtn.disabled = false; }
-  const hireStatus = $('hire-merchant-status');
-  if (hireStatus) hireStatus.classList.add('hidden');
-  renderMarket();
+  // Load saved merchant count from localStorage
+  extraMerchantsHired = getHiredMerchantCount();
+  renderMarket();                // renders 3 base merchants
+  // Restore previously-bought extra merchant slots (no charge)
+  for (let i = 0; i < extraMerchantsHired; i++) addExtraMerchantToGrid();
   renderPlayerListings();
+  refreshHireStatus();           // show "X slots unlocked" if any
+  updateHireMerchantBtn();       // set cost for the NEXT slot
   showScreen('market');
 }
 
-function shuffleItems() {
+const BASE_MERCHANTS = 3; // start with 3 merchants
+
+function shuffleItemsN(n) {
   const pool = [...ITEMS];
   const picked = [];
-  while (picked.length < MERCHANTS.length) {
+  while (picked.length < n) {
     const idx = Math.floor(Math.random() * pool.length);
     picked.push(pool.splice(idx, 1)[0]);
   }
@@ -860,9 +862,9 @@ function shuffleItems() {
 function renderMarket() {
   const grid = $('merchant-grid');
   grid.innerHTML = '';
-  const selectedItems = shuffleItems();
+  const selectedItems = shuffleItemsN(BASE_MERCHANTS);
 
-  MERCHANTS.forEach((merchant, i) => {
+  MERCHANTS.slice(0, BASE_MERCHANTS).forEach((merchant, i) => {
     const item      = selectedItems[i];
     const price     = Math.floor(Math.random() * 71) + 10; // 10–80
     const canAfford = currentUser.coins >= price;
@@ -1400,87 +1402,135 @@ async function handleCreateSubmit() {
 
 // ============================================================
 //  EXTRA MERCHANT (MARKET)
+//  Slots are PERMANENTLY bought (saved in localStorage).
+//  Each new slot costs 60% more than the previous one.
+//  200 → 320 → 512 → 819 → …
 // ============================================================
-const HIRE_MERCHANT_COST = 300;
-let extraMerchantHired   = false;
+const HIRE_BASE_COST       = 200;
+const HIRE_COST_MULTIPLIER = 1.6;
+let extraMerchantsHired    = 0; // loaded from localStorage each market visit
+
+// --- localStorage helpers ---
+function getHiredMerchantCount() {
+  if (!currentUser) return 0;
+  return parseInt(localStorage.getItem(`merchantSlots_${currentUser.username}`) || '0', 10);
+}
+function setHiredMerchantCount(n) {
+  if (!currentUser) return;
+  localStorage.setItem(`merchantSlots_${currentUser.username}`, String(n));
+}
+
+function getNextMerchantCost() {
+  // Cost for the NEXT slot to buy (based on already-owned slots)
+  return Math.round(HIRE_BASE_COST * Math.pow(HIRE_COST_MULTIPLIER, extraMerchantsHired));
+}
+
+function updateHireMerchantBtn() {
+  const btn  = $('hire-merchant-btn');
+  const cost = getNextMerchantCost();
+  const num  = BASE_MERCHANTS + extraMerchantsHired + 1;
+  btn.innerHTML = `⭐ Unlock Merchant Slot #${num} &nbsp;<span class="hire-cost">🪙 ${cost}</span>`;
+  btn.disabled  = currentUser.coins < cost;
+}
+
+function refreshHireStatus() {
+  const statusEl = $('hire-merchant-status');
+  if (extraMerchantsHired > 0) {
+    statusEl.textContent = `✅ ${extraMerchantsHired} extra slot${extraMerchantsHired > 1 ? 's' : ''} unlocked permanently`;
+    statusEl.classList.remove('hidden');
+  } else {
+    statusEl.classList.add('hidden');
+  }
+}
 
 async function handleHireMerchant() {
-  const btn = $('hire-merchant-btn');
-  if (extraMerchantHired || btn.disabled) return;
+  const btn  = $('hire-merchant-btn');
+  if (btn.disabled) return;
+  const cost = getNextMerchantCost();
 
-  if (currentUser.coins < HIRE_MERCHANT_COST) {
-    showToast(`Need 🪙 ${HIRE_MERCHANT_COST} coins to hire the extra merchant!`, true);
+  if (currentUser.coins < cost) {
+    showToast(`Need 🪙 ${cost} coins to unlock this merchant slot!`, true);
     return;
   }
 
   btn.disabled = true;
   try {
-    const { status, data } = await apiPost(`/users/${currentUser.id}/hire-merchant`, {});
+    const { status, data } = await apiPost(`/users/${currentUser.id}/hire-merchant`, { cost });
     if (status === 402) {
-      showToast(`Not enough coins! Need 🪙 ${HIRE_MERCHANT_COST}`, true);
-      btn.disabled = false;
+      showToast(`Not enough coins! Need 🪙 ${cost}`, true);
+      updateHireMerchantBtn();
       return;
     }
     if (status !== 200) {
       showToast('Could not hire merchant. Try again!', true);
-      btn.disabled = false;
+      updateHireMerchantBtn();
       return;
     }
     currentUser = data.user;
     updateBalances();
-    extraMerchantHired = true;
-    btn.classList.add('hidden');
-    $('hire-merchant-status').classList.remove('hidden');
+
+    // Persist the new count
+    extraMerchantsHired++;
+    setHiredMerchantCount(extraMerchantsHired);
+
+    // Add the new card to the grid
     addExtraMerchantToGrid();
-    showToast('⭐ Goldsworth the Extra Merchant is here!');
+    refreshHireStatus();
+    updateHireMerchantBtn();
+    showToast(`⭐ Merchant slot #${BASE_MERCHANTS + extraMerchantsHired} unlocked permanently!`);
   } catch (err) {
     showToast('Could not reach server!', true);
-    btn.disabled = false;
+    updateHireMerchantBtn();
   }
 }
 
 function addExtraMerchantToGrid() {
   const grid = $('merchant-grid');
+  // Pick one item not already shown
   const currentItems = [...grid.querySelectorAll('.buy-btn')].map(b => b.dataset.item);
   const pool = ITEMS.filter(i => !currentItems.includes(i.name));
   if (pool.length === 0) return;
-  const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 2);
-  shuffled.forEach(item => {
-    const price     = Math.floor(Math.random() * 51) + 30;
-    const canAfford = currentUser.coins >= price;
-    const card = document.createElement('div');
-    card.className = 'merchant-card extra-merchant-card';
-    card.innerHTML = `
-      <div class="merchant-avatar">⭐</div>
-      <div class="merchant-name extra-merchant-name">Goldsworth</div>
-      <div class="item-emoji">${item.emoji}</div>
-      <div class="item-name">${item.name}</div>
-      <div class="item-price">🪙 ${price}</div>
-      <button class="btn btn-green buy-btn" ${canAfford ? '' : 'disabled'}
-        data-item="${item.name}" data-merchant="Goldsworth" data-price="${price}">
-        ${canAfford ? 'Buy ✨' : 'Too expensive 💸'}
-      </button>
-    `;
-    grid.appendChild(card);
-  });
+  const item      = pool[Math.floor(Math.random() * pool.length)];
+  const price     = Math.floor(Math.random() * 51) + 30; // 30–80
+  const canAfford = currentUser.coins >= price;
+
+  const card = document.createElement('div');
+  card.className = 'merchant-card extra-merchant-card';
+  card.innerHTML = `
+    <div class="merchant-avatar">⭐</div>
+    <div class="merchant-name extra-merchant-name">Goldsworth</div>
+    <div class="item-emoji">${item.emoji}</div>
+    <div class="item-name">${item.name}</div>
+    <div class="item-price">🪙 ${price}</div>
+    <button class="btn btn-green buy-btn" ${canAfford ? '' : 'disabled'}
+      data-item="${item.name}" data-merchant="Goldsworth" data-price="${price}">
+      ${canAfford ? 'Buy ✨' : 'Too expensive 💸'}
+    </button>
+  `;
+  grid.appendChild(card);
 }
 
 // ============================================================
 //  BOSS FIGHT
 // ============================================================
 // Scaling: each win makes boss 15% harder
-const PLAYER_MAX_HP     = 80;   // harder base for player
-const BOSS_BASE_HP      = 150;  // harder base HP
+const PLAYER_MAX_HP     = 100;  // restored — game is already hard from boss scaling
+const BOSS_BASE_HP      = 150;
+const BOSS_ENTRY_COST   = 20;   // coins to challenge the boss
 const BOSS_REWARD_COINS = 75;
 
 // Per-user boss level persisted in localStorage
+// Key suffix "v2" resets everyone's progress back to Lv.1 on this deploy.
+// (This only affects client-side boss level — coins/items in DB are untouched.)
+const BOSS_LEVEL_KEY = (u) => `bossLevel_v2_${u}`;
+
 function getBossLevel() {
   if (!currentUser) return 1;
-  return parseInt(localStorage.getItem(`bossLevel_${currentUser.username}`) || '1', 10);
+  return parseInt(localStorage.getItem(BOSS_LEVEL_KEY(currentUser.username)) || '1', 10);
 }
 function setBossLevel(level) {
   if (!currentUser) return;
-  localStorage.setItem(`bossLevel_${currentUser.username}`, String(level));
+  localStorage.setItem(BOSS_LEVEL_KEY(currentUser.username), String(level));
 }
 function getBossScaledHp(level) {
   return Math.round(BOSS_BASE_HP * Math.pow(1.15, level - 1));
@@ -1499,14 +1549,16 @@ let bossAttacking    = false;
 let currentBossLevel = 1;
 
 function getBossDamageRange(item) {
-  if (item.is_custom)  return [20, 35]; // ★★★★ custom
-  if (item.is_crafted) return [14, 25]; // ★★★  crafted
+  // Tuned so a custom item comfortably beats boss Lv.3 (198 HP)
+  // Boss Lv.3 attacks 11–26 per turn; player has 100 HP (~4-5 turns to survive)
+  if (item.is_custom)  return [45, 75]; // ★★★★ avg ~60 → kills Lv.3 in 3-4 hits
+  if (item.is_crafted) return [30, 55]; // ★★★  avg ~42 → kills Lv.3 in 4-5 hits
   // Weapon-y market items
   const name = (item.item_name || '').toLowerCase();
   const weaponWords = ['sword','axe','ninja','shield','freeze','cannon','battle','magic','wand',
                        'potion','orb','crystal','fire','ice','thunder','star','bomb','dagger','lance'];
-  if (weaponWords.some(w => name.includes(w))) return [10, 20]; // ★★
-  return [6, 14]; // ★ regular
+  if (weaponWords.some(w => name.includes(w))) return [18, 32]; // ★★ avg ~25
+  return [10, 20]; // ★ regular market
 }
 
 function bossDamageRoll(item) {
@@ -1520,21 +1572,45 @@ function bossCounterRoll(level) {
 }
 
 function bossPowerLabel(item) {
-  if (item.is_custom)  return '★★★★ Custom';
-  if (item.is_crafted) return '★★★ Crafted';
+  const [min, max] = getBossDamageRange(item);
+  if (item.is_custom)  return `★★★★ Custom · ${min}–${max}⚔️`;
+  if (item.is_crafted) return `★★★ Crafted · ${min}–${max}⚔️`;
   const name = (item.item_name || '').toLowerCase();
   const weaponWords = ['sword','axe','ninja','shield','freeze','cannon','battle','magic','wand',
                        'potion','orb','crystal','fire','ice','thunder','star','bomb'];
-  return weaponWords.some(w => name.includes(w)) ? '★★ Weapon' : '★ Item';
+  return weaponWords.some(w => name.includes(w))
+    ? `★★ Weapon · ${min}–${max}⚔️`
+    : `★ Item · ${min}–${max}⚔️`;
 }
 
 async function goToBossScreen() {
+  // Check entry fee before switching screens
+  if (currentUser.coins < BOSS_ENTRY_COST) {
+    showToast(`Need 🪙 ${BOSS_ENTRY_COST} coins to enter the Dragon's Lair!`, true);
+    return;
+  }
+
   updateBalances();
   showScreen('boss');
   $('boss-player-label').textContent = `👤 ${currentUser.username}`;
   $('boss-loading').classList.remove('hidden');
   $('boss-no-items').classList.add('hidden');
   $('boss-arena').classList.add('hidden');
+
+  // Deduct entry fee
+  try {
+    const entryRes = await apiPost(`/users/${currentUser.id}/boss-entry`, {});
+    if (entryRes.status === 402) {
+      showToast('Not enough coins to enter!', true);
+      $('boss-loading').classList.add('hidden');
+      goToRollScreen();
+      return;
+    }
+    if (entryRes.status === 200) {
+      currentUser = entryRes.data.user;
+      updateBalances();
+    }
+  } catch (_) { /* non-critical */ }
 
   try {
     const { status, data } = await apiGet(`/users/${currentUser.id}/inventory`);
@@ -1591,7 +1667,8 @@ function startBossBattle() {
   const log = $('boss-log');
   log.innerHTML = '';
   const [dmgMin, dmgMax] = getBossScaledDmgRange(currentBossLevel);
-  addBossLog(`🐲 Dragon Boss (Lv. ${currentBossLevel}) appears! HP: ${bossTotalHp} | Attacks: ${dmgMin}–${dmgMax} dmg`, 'info');
+  addBossLog(`🪙 ${BOSS_ENTRY_COST} coins entry fee paid. The Dragon's Lair opens...`, 'info');
+  addBossLog(`🐲 Dragon Boss (Lv. ${currentBossLevel}) appears! HP: ${bossTotalHp} | Attacks: ${dmgMin}–${dmgMax} dmg`, 'boss-hit');
   addBossLog(`❤️ Your HP: ${PLAYER_MAX_HP} | ⚔️ Pick a weapon to attack!`, 'info');
 
   renderBossItems();
