@@ -2018,10 +2018,12 @@ async function fetchConversation() {
   }
 
   list.innerHTML = data.messages.map(m => {
-    const isMe = m.sender_id === currentUser.id;
-    const time  = new Date(m.created_at + 'Z').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const isMe       = m.sender_id === currentUser.id;
+    const senderName = isMe ? 'You' : m.sender_username;
+    const time       = new Date(m.created_at + 'Z').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     return `
       <div class="chat-msg ${isMe ? 'chat-msg-me' : 'chat-msg-them'}">
+        <div class="chat-sender-name">${escapeHtml(senderName)}</div>
         <div class="chat-bubble">${escapeHtml(m.message)}</div>
         <div class="chat-time">${time}</div>
       </div>
