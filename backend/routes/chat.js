@@ -60,35 +60,29 @@ router.post('/send', (req, res) => {
 });
 
 // GET /chat/inbox?me=userId — list recent conversations (last message per contact)
+// Uses GROUP BY instead of window functions for sql.js compatibility
 router.get('/inbox', (req, res) => {
   const meId = parseInt(req.query.me, 10);
   if (!meId) return res.status(400).json({ error: 'Missing me param.' });
 
   const rows = db.prepare(`
-    SELECT
-      partner_id,
-      partner_username,
-      last_message,
-      last_at
+    SELECT partner_id, partner_username, message AS last_message, created_at AS last_at
     FROM (
       SELECT
-        CASE WHEN sender_id = ? THEN recipient_id ELSE sender_id END AS partner_id,
-        CASE WHEN sender_id = ? THEN ru.username   ELSE su.username  END AS partner_username,
-        message AS last_message,
-        created_at AS last_at,
-        ROW_NUMBER() OVER (
-          PARTITION BY CASE WHEN sender_id = ? THEN recipient_id ELSE sender_id END
-          ORDER BY created_at DESC
-        ) AS rn
+        CASE WHEN m.sender_id = ? THEN m.recipient_id ELSE m.sender_id END AS partner_id,
+        CASE WHEN m.sender_id = ? THEN ru.username   ELSE su.username   END AS partner_username,
+        m.message,
+        m.created_at
       FROM messages m
       JOIN users su ON su.id = m.sender_id
       JOIN users ru ON ru.id = m.recipient_id
-      WHERE sender_id = ? OR recipient_id = ?
+      WHERE m.sender_id = ? OR m.recipient_id = ?
+      ORDER BY m.created_at DESC
     )
-    WHERE rn = 1
+    GROUP BY partner_id
     ORDER BY last_at DESC
     LIMIT 20
-  `).all(meId, meId, meId, meId, meId);
+  `).all(meId, meId, meId, meId);
 
   return res.json({ conversations: rows });
 });

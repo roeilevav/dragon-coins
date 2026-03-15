@@ -481,7 +481,11 @@ let inventoryCountMap = {}; // { itemName: count } — refreshed each market vis
 function $(id) { return document.getElementById(id); }
 
 function showScreen(name) {
-  if (name !== 'chat') stopChatPoll(); // stop polling when leaving chat
+  if (name !== 'chat') {
+    stopChatPoll();
+    clearInterval(chatInboxInterval);
+    chatInboxInterval = null;
+  }
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $(`screen-${name}`).classList.add('active');
 }
@@ -1914,6 +1918,7 @@ function handleLogout() {
 //  CHAT SCREEN
 // ============================================================
 let chatPollInterval  = null;
+let chatInboxInterval = null;
 let chatWithUserId    = null;
 let chatWithUsername  = '';
 
@@ -1923,6 +1928,9 @@ function goToChatScreen() {
   showScreen('chat');
   showChatInbox();
   loadChatInbox();
+  // Poll inbox every 4 seconds so new incoming conversations appear automatically
+  clearInterval(chatInboxInterval);
+  chatInboxInterval = setInterval(loadChatInbox, 4000);
 }
 
 async function loadChatInbox() {
@@ -1959,6 +1967,10 @@ function showChatInbox() {
   $('chat-conv-panel').classList.add('hidden');
   $('chat-search-input').value = '';
   $('chat-search-results').innerHTML = '';
+  loadChatInbox();
+  // Resume inbox polling
+  clearInterval(chatInboxInterval);
+  chatInboxInterval = setInterval(loadChatInbox, 4000);
 }
 
 function showChatSearchPanel() {
@@ -1996,9 +2008,11 @@ async function handleChatSearch() {
 }
 
 function openConversation(userId, username) {
+  clearInterval(chatInboxInterval); // stop inbox refresh while in conversation
   chatWithUserId   = userId;
   chatWithUsername = username;
   $('chat-panel').classList.add('hidden');
+  $('chat-search-panel').classList.add('hidden');
   $('chat-conv-panel').classList.remove('hidden');
   $('chat-conv-title').textContent = `💬 ${username}`;
   $('chat-msg-input').value = '';
@@ -2030,8 +2044,8 @@ async function fetchConversation() {
     `;
   }).join('');
 
-  // Scroll to bottom
-  list.scrollTop = list.scrollHeight;
+  // Scroll to bottom after browser has painted the new content
+  requestAnimationFrame(() => { list.scrollTop = list.scrollHeight; });
 }
 
 function escapeHtml(str) {
