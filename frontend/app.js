@@ -719,7 +719,7 @@ async function handleRollQuizAnswer(e) {
       const bonusStr = data.customBonus > 0
         ? ` <span class="roll-custom-bonus">✨ +${data.customBonus}% custom bonus!</span>`
         : '';
-      resultEl.innerHTML = `<span class="roll-quiz-correct">🎉 Correct! You earned <strong>🪙 ${data.earned}</strong> Dragon Coins!${bonusStr}</span>`;
+      resultEl.innerHTML = `<span class="roll-quiz-correct">🎉 Correct! You earned <strong>🪙 ${data.earned}</strong> Magic Coins!${bonusStr}</span>`;
     } else {
       resultEl.innerHTML = `<span class="roll-quiz-wrong">❌ Wrong! You lost <strong>🪙 ${data.lost}</strong> coins. Better luck next time!</span>`;
     }
