@@ -473,6 +473,18 @@ body {
 .item-emoji      { font-size: 1.6rem; }
 .item-price      { font-weight: 800; color: var(--gold-dk); font-size: 1rem; }
 
+.item-boss-power {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.02em;
+}
+.item-boss-power-green  { background: #d1fae5; color: #065f46; }
+.item-boss-power-orange { background: #ffedd5; color: #9a3412; }
+.item-boss-power-red    { background: #fee2e2; color: #991b1b; }
+
 .merchant-card .btn {
   font-size: 0.85rem;
   padding: 10px 16px;

@@ -8,62 +8,62 @@ const API_BASE = '';
 //  ITEM POOL & MERCHANTS
 // ============================================================
 const ITEMS = [
-  { name: 'rocket',           emoji: '🚀' },
-  { name: 'magic carpet',     emoji: '🧞' },
-  { name: 'invisible cloak',  emoji: '🧥' },
-  { name: 'dinosaur egg',     emoji: '🦕' },
-  { name: 'treasure map',     emoji: '🗺️' },
-  { name: 'jetpack',          emoji: '🎒' },
-  { name: 'time machine',     emoji: '⏰' },
-  { name: 'dragon saddle',    emoji: '🐉' },
-  { name: 'crystal ball',     emoji: '🔮' },
-  { name: 'giant sandwich',   emoji: '🥪' },
-  { name: 'cloud shoes',      emoji: '☁️' },
-  { name: 'robot butler',     emoji: '🤖' },
-  { name: 'moon rock',        emoji: '🌙' },
-  { name: 'pirate hat',       emoji: '🏴‍☠️' },
-  { name: 'lava lamp',        emoji: '💡' },
-  { name: 'rainbow bridge',   emoji: '🌈' },
-  { name: 'submarine',        emoji: '🤿' },
-  { name: 'enchanted sword',  emoji: '⚔️' },
-  { name: 'talking parrot',   emoji: '🦜' },
-  { name: 'gold telescope',   emoji: '🔭' },
-  { name: 'flying carpet',    emoji: '🪁' },
-  { name: 'giant magnet',     emoji: '🧲' },
-  { name: 'mystery box',      emoji: '📦' },
-  { name: 'ninja stars',      emoji: '⭐' },
-  { name: 'hot air balloon',  emoji: '🎈' },
+  { name: 'rocket',           emoji: '🚀', bossPower: 4 },
+  { name: 'magic carpet',     emoji: '🧞', bossPower: 3 },
+  { name: 'invisible cloak',  emoji: '🧥', bossPower: 3 },
+  { name: 'dinosaur egg',     emoji: '🦕', bossPower: 2 },
+  { name: 'treasure map',     emoji: '🗺️', bossPower: 2 },
+  { name: 'jetpack',          emoji: '🎒', bossPower: 4 },
+  { name: 'time machine',     emoji: '⏰', bossPower: 5 },
+  { name: 'dragon saddle',    emoji: '🐉', bossPower: 5 },
+  { name: 'crystal ball',     emoji: '🔮', bossPower: 4 },
+  { name: 'giant sandwich',   emoji: '🥪', bossPower: 2 },
+  { name: 'cloud shoes',      emoji: '☁️', bossPower: 3 },
+  { name: 'robot butler',     emoji: '🤖', bossPower: 3 },
+  { name: 'moon rock',        emoji: '🌙', bossPower: 3 },
+  { name: 'pirate hat',       emoji: '🏴‍☠️', bossPower: 2 },
+  { name: 'lava lamp',        emoji: '💡', bossPower: 2 },
+  { name: 'rainbow bridge',   emoji: '🌈', bossPower: 3 },
+  { name: 'submarine',        emoji: '🤿', bossPower: 2 },
+  { name: 'enchanted sword',  emoji: '⚔️', bossPower: 5 },
+  { name: 'talking parrot',   emoji: '🦜', bossPower: 2 },
+  { name: 'gold telescope',   emoji: '🔭', bossPower: 3 },
+  { name: 'flying carpet',    emoji: '🪁', bossPower: 3 },
+  { name: 'giant magnet',     emoji: '🧲', bossPower: 3 },
+  { name: 'mystery box',      emoji: '📦', bossPower: 2 },
+  { name: 'ninja stars',      emoji: '⭐', bossPower: 4 },
+  { name: 'hot air balloon',  emoji: '🎈', bossPower: 2 },
   // --- 30 new items ---
-  { name: 'freeze ray',       emoji: '❄️' },
-  { name: 'magic wand',       emoji: '🪄' },
-  { name: 'enchanted shield', emoji: '🛡️' },
-  { name: 'hoverboard',       emoji: '🛹' },
-  { name: 'space helmet',     emoji: '🪐' },
-  { name: 'magic potion',     emoji: '🧪' },
-  { name: 'ancient scroll',   emoji: '📜' },
-  { name: 'battle axe',       emoji: '🪓' },
-  { name: 'golden compass',   emoji: '🧭' },
-  { name: 'ice crown',        emoji: '👑' },
-  { name: 'speed boots',      emoji: '👟' },
-  { name: 'wizard hat',       emoji: '🎩' },
-  { name: 'chaos orb',        emoji: '🌀' },
-  { name: 'grappling hook',   emoji: '🪝' },
-  { name: 'bubble cannon',    emoji: '🫧' },
-  { name: 'gemstone',         emoji: '💎' },
-  { name: 'storm lantern',    emoji: '🏮' },
-  { name: 'crystal key',      emoji: '🗝️' },
-  { name: 'dragon flute',     emoji: '🎶' },
-  { name: 'echo horn',        emoji: '📯' },
-  { name: 'lava shield',      emoji: '🌋' },
-  { name: 'ghost detector',   emoji: '👻' },
-  { name: 'sonic goggles',    emoji: '🥽' },
-  { name: 'phoenix feather',  emoji: '🪶' },
-  { name: 'jungle vine',      emoji: '🌿' },
-  { name: 'thunder drum',     emoji: '🥁' },
-  { name: 'shadow mask',      emoji: '🎭' },
-  { name: 'cosmic cookie',    emoji: '🍪' },
-  { name: 'portal stone',     emoji: '🔵' },
-  { name: 'stardust bottle',  emoji: '✨' },
+  { name: 'freeze ray',       emoji: '❄️', bossPower: 4 },
+  { name: 'magic wand',       emoji: '🪄', bossPower: 4 },
+  { name: 'enchanted shield', emoji: '🛡️', bossPower: 4 },
+  { name: 'hoverboard',       emoji: '🛹', bossPower: 3 },
+  { name: 'space helmet',     emoji: '🪐', bossPower: 3 },
+  { name: 'magic potion',     emoji: '🧪', bossPower: 4 },
+  { name: 'ancient scroll',   emoji: '📜', bossPower: 3 },
+  { name: 'battle axe',       emoji: '🪓', bossPower: 5 },
+  { name: 'golden compass',   emoji: '🧭', bossPower: 2 },
+  { name: 'ice crown',        emoji: '👑', bossPower: 4 },
+  { name: 'speed boots',      emoji: '👟', bossPower: 3 },
+  { name: 'wizard hat',       emoji: '🎩', bossPower: 4 },
+  { name: 'chaos orb',        emoji: '🌀', bossPower: 5 },
+  { name: 'grappling hook',   emoji: '🪝', bossPower: 3 },
+  { name: 'bubble cannon',    emoji: '🫧', bossPower: 2 },
+  { name: 'gemstone',         emoji: '💎', bossPower: 4 },
+  { name: 'storm lantern',    emoji: '🏮', bossPower: 3 },
+  { name: 'crystal key',      emoji: '🗝️', bossPower: 3 },
+  { name: 'dragon flute',     emoji: '🎶', bossPower: 4 },
+  { name: 'echo horn',        emoji: '📯', bossPower: 3 },
+  { name: 'lava shield',      emoji: '🌋', bossPower: 5 },
+  { name: 'ghost detector',   emoji: '👻', bossPower: 2 },
+  { name: 'sonic goggles',    emoji: '🥽', bossPower: 3 },
+  { name: 'phoenix feather',  emoji: '🪶', bossPower: 5 },
+  { name: 'jungle vine',      emoji: '🌿', bossPower: 2 },
+  { name: 'thunder drum',     emoji: '🥁', bossPower: 4 },
+  { name: 'shadow mask',      emoji: '🎭', bossPower: 3 },
+  { name: 'cosmic cookie',    emoji: '🍪', bossPower: 2 },
+  { name: 'portal stone',     emoji: '🔵', bossPower: 4 },
+  { name: 'stardust bottle',  emoji: '✨', bossPower: 5 },
 ];
 
 const MERCHANTS = [
@@ -994,6 +994,7 @@ function renderMarket() {
 
     const ownedCount = inventoryCountMap[item.name] || 0;
     const countBadge = ownedCount >= 2 ? `<div class="item-owned-badge">×${ownedCount}</div>` : '';
+    const powerColor = item.bossPower >= 5 ? 'item-boss-power-red' : item.bossPower >= 4 ? 'item-boss-power-orange' : 'item-boss-power-green';
 
     const card = document.createElement('div');
     card.className = 'merchant-card';
@@ -1002,6 +1003,7 @@ function renderMarket() {
       <div class="merchant-name">${merchant.name}</div>
       <div class="item-emoji">${item.emoji}</div>
       <div class="item-name">${item.name}</div>
+      <div class="item-boss-power ${powerColor}">⚔️ +${item.bossPower}% Boss</div>
       <div class="item-price">🪙 ${price}</div>
       <button class="btn btn-green buy-btn" ${canAfford ? '' : 'disabled'}
         data-item="${item.name}" data-merchant="${merchant.name}" data-price="${price}">
@@ -1632,6 +1634,7 @@ function addExtraMerchantToGrid() {
 
   const ownedCount = inventoryCountMap[item.name] || 0;
   const countBadge = ownedCount >= 2 ? `<div class="item-owned-badge">×${ownedCount}</div>` : '';
+  const powerColor = item.bossPower >= 5 ? 'item-boss-power-red' : item.bossPower >= 4 ? 'item-boss-power-orange' : 'item-boss-power-green';
 
   const card = document.createElement('div');
   card.className = 'merchant-card extra-merchant-card';
@@ -1640,6 +1643,7 @@ function addExtraMerchantToGrid() {
     <div class="merchant-name extra-merchant-name">Goldsworth</div>
     <div class="item-emoji">${item.emoji}</div>
     <div class="item-name">${item.name}</div>
+    <div class="item-boss-power ${powerColor}">⚔️ +${item.bossPower}% Boss</div>
     <div class="item-price">🪙 ${price}</div>
     <button class="btn btn-green buy-btn" ${canAfford ? '' : 'disabled'}
       data-item="${item.name}" data-merchant="Goldsworth" data-price="${price}">
