@@ -2455,7 +2455,7 @@ function attachListeners() {
     if (tutorialCurrentSlide > 0) { tutorialCurrentSlide--; renderTutorialSlide(); }
   });
   $('tutorial-next-btn').addEventListener('click', () => {
-    if (tutorialCurrentSlide < TUTORIAL_SLIDES.length - 1) { tutorialCurrentSlide++; renderTutorialSlide(); }
+    if (tutorialCurrentSlide < getTutorialSlides().length - 1) { tutorialCurrentSlide++; renderTutorialSlide(); }
     else closeTutorial();
   });
 }
