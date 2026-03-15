@@ -1955,19 +1955,27 @@ function showChatInbox() {
   chatWithUserId   = null;
   chatWithUsername = '';
   $('chat-panel').classList.remove('hidden');
+  $('chat-search-panel').classList.add('hidden');
   $('chat-conv-panel').classList.add('hidden');
   $('chat-search-input').value = '';
-  $('chat-search-results').classList.add('hidden');
   $('chat-search-results').innerHTML = '';
+}
+
+function showChatSearchPanel() {
+  $('chat-panel').classList.add('hidden');
+  $('chat-search-panel').classList.remove('hidden');
+  $('chat-conv-panel').classList.add('hidden');
+  $('chat-search-input').value = '';
+  $('chat-search-results').innerHTML = '';
+  $('chat-search-input').focus();
 }
 
 async function handleChatSearch() {
   const q   = $('chat-search-input').value.trim();
   const res = $('chat-search-results');
-  if (!q) { res.classList.add('hidden'); return; }
+  if (!q) { res.innerHTML = ''; return; }
 
   const { status, data } = await apiGet(`/chat/search?q=${encodeURIComponent(q)}&me=${currentUser.id}`);
-  res.classList.remove('hidden');
 
   if (status !== 200 || data.users.length === 0) {
     res.innerHTML = `<p class="chat-no-results">No players found for "${q}"</p>`;
@@ -2144,16 +2152,12 @@ function attachListeners() {
   $('nav-chat-from-craft').addEventListener('click',      e => { e.preventDefault(); goToChatScreen(); });
   $('nav-chat-from-create').addEventListener('click',     e => { e.preventDefault(); goToChatScreen(); });
 
-  // Chat screen nav back to other screens
-  $('nav-roll-from-chat').addEventListener('click',       e => { e.preventDefault(); goToRollScreen(); });
-  $('nav-market-from-chat').addEventListener('click',     e => { e.preventDefault(); goToMarketScreen(); });
-  $('nav-inventory-from-chat').addEventListener('click',  e => { e.preventDefault(); goToInventoryScreen(); });
-  $('nav-leaderboard-from-chat').addEventListener('click',e => { e.preventDefault(); goToLeaderboardScreen(); });
-  $('nav-craft-from-chat').addEventListener('click',      e => { e.preventDefault(); goToCraftScreen(); });
-  $('nav-create-from-chat').addEventListener('click',     e => { e.preventDefault(); goToCreateScreen(); });
-  $('nav-boss-from-chat').addEventListener('click',       e => { e.preventDefault(); goToBossScreen(); });
+  // (Chat top bar only has Roll button — wired above)
 
   // Chat controls
+  $('chat-roll-btn').addEventListener('click', goToRollScreen);
+  $('chat-open-search-btn').addEventListener('click', showChatSearchPanel);
+  $('chat-search-back-btn').addEventListener('click', showChatInbox);
   $('chat-search-btn').addEventListener('click', handleChatSearch);
   $('chat-search-input').addEventListener('keydown', e => { if (e.key === 'Enter') handleChatSearch(); });
   $('chat-send-btn').addEventListener('click', handleChatSend);

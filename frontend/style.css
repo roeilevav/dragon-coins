@@ -1510,7 +1510,20 @@ body {
   margin-bottom: 4px;
 }
 
-/* Search row */
+/* Big centred search button */
+.chat-search-center {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 20px;
+}
+.chat-big-search-btn {
+  font-size: 1.1rem;
+  padding: 16px 40px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+/* Search panel row (inside search panel) */
 .chat-search-row {
   display: flex;
   gap: 10px;

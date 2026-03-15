@@ -379,37 +379,40 @@
         <span id="chat-username" class="username-tag"></span>
         <span class="balance" id="chat-balance">🪙 0</span>
       </div>
-      <nav class="nav-links">
-        <a href="#" id="nav-roll-from-chat">🎲 Roll</a>
-        <a href="#" id="nav-market-from-chat">🛍️ Market</a>
-        <a href="#" id="nav-inventory-from-chat">🎒 Inventory</a>
-        <a href="#" id="nav-leaderboard-from-chat">🏆 Leaderboard</a>
-        <a href="#" id="nav-craft-from-chat">🔨 Craft</a>
-        <a href="#" id="nav-create-from-chat">🎨 Create</a>
-        <a href="#" id="nav-boss-from-chat" class="nav-boss-link">⚔️ Boss</a>
-      </nav>
+      <button id="chat-roll-btn" class="btn btn-gold">🎲 Roll</button>
       <button class="btn btn-logout logout-btn">🚪 Logout</button>
     </header>
 
     <main class="chat-main">
 
-      <!-- Inbox + Search panel -->
+      <!-- Inbox panel (default view) -->
       <div id="chat-panel">
         <h2 class="chat-title">💬 Chat</h2>
 
-        <div class="chat-search-row">
-          <input id="chat-search-input" class="chat-search-input" type="text" placeholder="Search player by name…" />
-          <button id="chat-search-btn" class="btn btn-purple">🔍 Search</button>
+        <!-- Big centred search button -->
+        <div class="chat-search-center">
+          <button id="chat-open-search-btn" class="btn btn-purple btn-large chat-big-search-btn">🔍 Search Player</button>
         </div>
-
-        <div id="chat-search-results" class="chat-search-results hidden"></div>
 
         <div id="chat-inbox-section">
           <p class="chat-section-label">Recent conversations</p>
           <div id="chat-inbox-list" class="chat-inbox-list">
-            <p class="empty-state" id="chat-inbox-empty">No conversations yet — search for a player to start! 👆</p>
+            <p class="empty-state" id="chat-inbox-empty">No conversations yet — press Search to find a player! 👆</p>
           </div>
         </div>
+      </div>
+
+      <!-- Search panel (shown when Search button clicked) -->
+      <div id="chat-search-panel" class="hidden">
+        <div class="chat-conv-header">
+          <button id="chat-search-back-btn" class="btn btn-purple chat-back-btn">← Back</button>
+          <span class="chat-conv-title">🔍 Find a Player</span>
+        </div>
+        <div class="chat-search-row">
+          <input id="chat-search-input" class="chat-search-input" type="text" placeholder="Type a username…" />
+          <button id="chat-search-btn" class="btn btn-purple">Search</button>
+        </div>
+        <div id="chat-search-results" class="chat-search-results"></div>
       </div>
 
       <!-- Conversation view -->
