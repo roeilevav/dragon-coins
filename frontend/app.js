@@ -1158,8 +1158,17 @@ async function goToCraftScreen() {
       .filter(i => i.listed_price == null && !i.is_crafted)
       .map(i => i.item_name);
 
+    // Sort recipes: most ingredients owned (by ratio) first, none owned last
+    const sortedCrafts = [...CRAFTS].sort((a, b) => {
+      const aHave = a.requires.filter(r => ownedItems.includes(r)).length;
+      const bHave = b.requires.filter(r => ownedItems.includes(r)).length;
+      const aRatio = aHave / a.requires.length;
+      const bRatio = bHave / b.requires.length;
+      return bRatio - aRatio;
+    });
+
     // Show ALL recipes — locked or unlocked based on owned items
-    grid.innerHTML = CRAFTS.map(c => {
+    grid.innerHTML = sortedCrafts.map(c => {
       const canCraft = c.requires.every(req => ownedItems.includes(req));
 
       const ingBadges = c.requires.map(req => {
