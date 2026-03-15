@@ -1,7 +1,20 @@
 const path = require('path');
 const fs = require('fs');
 
-const DB_PATH = path.join(__dirname, 'dragon_coins.db');
+// DB_PATH can be overridden by an environment variable so Railway can
+// point it at a persistent Volume (e.g. /data/dragon_coins.db).
+// Without the env var it falls back to the local backend/ folder,
+// which is fine for local development.
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'dragon_coins.db');
+
+// Make sure the directory exists (important when using a mounted Volume)
+const dbDir = path.dirname(DB_PATH);
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+  console.log(`[DB] Created directory: ${dbDir}`);
+}
+
+console.log(`[DB] Using database at: ${DB_PATH}`);
 
 let _sqlDb = null;
 let _inTransaction = false;
