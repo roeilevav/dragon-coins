@@ -473,6 +473,7 @@ let currentUser    = null;
 let countdownInterval = null;
 let pendingPurchase = null; // set when quiz opens
 let pendingRollToken = null; // token from /roll/start
+let inventoryCountMap = {}; // { itemName: count } — refreshed each market visit
 
 // ============================================================
 //  DOM HELPERS
@@ -827,7 +828,8 @@ async function confirmQuizPurchase() {
     updateBalances();
     showToast(`Bought ${itemName}! 🎉`);
     closeQuizModal();
-    setTimeout(() => {
+    setTimeout(async () => {
+      await refreshInventoryCounts();
       renderMarket();
       for (let i = 0; i < extraMerchantsHired; i++) addExtraMerchantToGrid();
       renderPlayerListings();
@@ -848,10 +850,23 @@ function closeQuizModal() {
 // ============================================================
 //  MARKET SCREEN
 // ============================================================
-function goToMarketScreen() {
+async function refreshInventoryCounts() {
+  try {
+    const { status, data } = await apiGet(`/users/${currentUser.id}/inventory`);
+    inventoryCountMap = {};
+    if (status === 200) {
+      data.items.forEach(i => {
+        inventoryCountMap[i.item_name] = (inventoryCountMap[i.item_name] || 0) + 1;
+      });
+    }
+  } catch (e) { inventoryCountMap = {}; }
+}
+
+async function goToMarketScreen() {
   updateBalances();
   // Load saved merchant count from localStorage
   extraMerchantsHired = getHiredMerchantCount();
+  await refreshInventoryCounts(); // fetch owned counts for the ×N badges
   renderMarket();                // renders 3 base merchants
   // Restore previously-bought extra merchant slots (no charge)
   for (let i = 0; i < extraMerchantsHired; i++) addExtraMerchantToGrid();
@@ -883,6 +898,9 @@ function renderMarket() {
     const price     = Math.floor(Math.random() * 71) + 10; // 10–80
     const canAfford = currentUser.coins >= price;
 
+    const ownedCount = inventoryCountMap[item.name] || 0;
+    const countBadge = ownedCount >= 2 ? `<div class="item-owned-badge">×${ownedCount}</div>` : '';
+
     const card = document.createElement('div');
     card.className = 'merchant-card';
     card.innerHTML = `
@@ -895,6 +913,7 @@ function renderMarket() {
         data-item="${item.name}" data-merchant="${merchant.name}" data-price="${price}">
         ${canAfford ? 'Buy ✨' : 'Too expensive 💸'}
       </button>
+      ${countBadge}
     `;
     grid.appendChild(card);
   });
@@ -1517,6 +1536,9 @@ function addExtraMerchantToGrid() {
   const price     = Math.floor(Math.random() * 51) + 30; // 30–80
   const canAfford = currentUser.coins >= price;
 
+  const ownedCount = inventoryCountMap[item.name] || 0;
+  const countBadge = ownedCount >= 2 ? `<div class="item-owned-badge">×${ownedCount}</div>` : '';
+
   const card = document.createElement('div');
   card.className = 'merchant-card extra-merchant-card';
   card.innerHTML = `
@@ -1529,6 +1551,7 @@ function addExtraMerchantToGrid() {
       data-item="${item.name}" data-merchant="Goldsworth" data-price="${price}">
       ${canAfford ? 'Buy ✨' : 'Too expensive 💸'}
     </button>
+    ${countBadge}
   `;
   grid.appendChild(card);
 }

@@ -440,6 +440,21 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  position: relative;
+}
+
+.item-owned-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: #e63946;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  pointer-events: none;
+  letter-spacing: 0.03em;
 }
 
 .merchant-card:hover { border-color: var(--gold); transform: translateY(-3px); }
