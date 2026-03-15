@@ -38,6 +38,8 @@ router.post('/make', (req, res) => {
       `INSERT INTO inventory (user_id, item_name, merchant_name, price_paid, is_crafted)
        VALUES (?, ?, 'Crafted', 0, 1)`
     ).run(Number(user_id), craft_name);
+    // Award 15 points for crafting
+    db.prepare('UPDATE users SET points = points + 15 WHERE id = ?').run(Number(user_id));
   });
   doCraft();
 

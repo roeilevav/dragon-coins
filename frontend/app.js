@@ -1153,7 +1153,7 @@ async function goToLeaderboardScreen() {
           <span class="lb-rank ${rankClass[i] || ''}">${rankEmoji[i] || `#${i + 1}`}</span>
           <span class="lb-username">${row.username}</span>
           ${isMe ? '<span class="lb-you-badge">You!</span>' : ''}
-          <span class="lb-coins">🪙 ${row.coins}</span>
+          <span class="lb-coins">⭐ ${row.points} pts</span>
         </div>
       `;
     }).join('');

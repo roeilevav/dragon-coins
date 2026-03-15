@@ -276,8 +276,9 @@ router.post('/:id/roll/answer', (req, res) => {
   const isCorrect = answer === pending.correctIndex;
 
   if (isCorrect) {
-    db.prepare('UPDATE users SET coins = coins + ? WHERE id = ?')
-      .run(pending.earned, userId);
+    // Coins + matching points (1 coin = 1 point)
+    db.prepare('UPDATE users SET coins = coins + ?, points = points + ? WHERE id = ?')
+      .run(pending.earned, pending.earned, userId);
   }
 
   const updated = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
@@ -429,7 +430,7 @@ router.post('/:id/boss-reward', (req, res) => {
     return res.status(429).json({ error: 'Already claimed boss reward recently!', remaining_ms: remaining });
   }
 
-  db.prepare('UPDATE users SET coins = coins + ? WHERE id = ?').run(BOSS_REWARD_AMT, userId);
+  db.prepare('UPDATE users SET coins = coins + ?, points = points + 50 WHERE id = ?').run(BOSS_REWARD_AMT, userId);
   bossRewards.set(userId, Date.now());
 
   const updated = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);

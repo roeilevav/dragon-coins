@@ -37,6 +37,8 @@ router.post('/create', (req, res) => {
         (user_id, item_name, merchant_name, price_paid, is_custom, creator_name, item_image)
       VALUES (?, ?, 'Custom', 0, 1, ?, ?)
     `).run(Number(user_id), item_name.trim(), creator_name.trim(), item_image);
+    // Award 45 points for creating a custom item
+    db.prepare('UPDATE users SET points = points + 45 WHERE id = ?').run(Number(user_id));
   });
   doCreate();
 

@@ -133,6 +133,9 @@ async function initDb() {
   // Migration: track which roll questions each user has already seen
   try { _sqlDb.exec("ALTER TABLE users ADD COLUMN seen_questions TEXT NOT NULL DEFAULT '[]'"); } catch (e) {}
 
+  // Migration: leaderboard points (earned coins + boss wins + crafts + customs)
+  try { _sqlDb.exec('ALTER TABLE users ADD COLUMN points INTEGER NOT NULL DEFAULT 0'); } catch (e) {}
+
   // Missions: track which missions each user has completed
   _sqlDb.exec(`
     CREATE TABLE IF NOT EXISTS completed_missions (
